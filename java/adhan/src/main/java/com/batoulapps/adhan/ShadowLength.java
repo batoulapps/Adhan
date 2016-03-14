@@ -1,0 +1,16 @@
+package com.batoulapps.adhan;
+
+public enum ShadowLength {
+  SINGLE(1.0),
+  DOUBLE(2.0);
+
+  private final double shadowLength;
+
+  ShadowLength(double shadowLength) {
+    this.shadowLength = shadowLength;
+  }
+
+  double getShadowLength() {
+    return this.shadowLength;
+  }
+}
