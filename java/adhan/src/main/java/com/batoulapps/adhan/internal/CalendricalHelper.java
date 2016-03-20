@@ -1,5 +1,8 @@
 package com.batoulapps.adhan.internal;
 
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
+
 class CalendricalHelper {
 
   /**
@@ -11,6 +14,16 @@ class CalendricalHelper {
    */
   static double julianDay(int year, int month, int day) {
     return julianDay(year, month, day, 0.0);
+  }
+
+  static double julianDay(LocalDate localDate) {
+    return julianDay(localDate.getYear(),
+        localDate.getMonthValue(), localDate.getDayOfMonth(), 0.0);
+  }
+
+  static double julianDay(LocalDateTime localDateTime) {
+    return julianDay(localDateTime.getYear(), localDateTime.getMonthValue(),
+        localDateTime.getDayOfMonth(), localDateTime.getHour() + localDateTime.getMinute() / 60.0);
   }
 
   /**

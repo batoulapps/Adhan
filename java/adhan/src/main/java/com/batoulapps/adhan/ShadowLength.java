@@ -10,7 +10,7 @@ public enum ShadowLength {
     this.shadowLength = shadowLength;
   }
 
-  double getShadowLength() {
+  public double getShadowLength() {
     return this.shadowLength;
   }
 }
