@@ -159,7 +159,7 @@ class Astronomical {
    * @param L0 the solar longitude
    * @param Lp the lunar longitude
    * @param Ω the ascending node
-   * @return
+   * @return the nutation in obliquity
    */
   static double nutationInObliquity(double T, double L0, double Lp, double Ω) {
     /* Equation from Astronomical Algorithms page 144 */

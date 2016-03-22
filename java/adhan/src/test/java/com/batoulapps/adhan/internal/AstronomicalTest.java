@@ -3,6 +3,10 @@ package com.batoulapps.adhan.internal;
 import com.batoulapps.adhan.Coordinates;
 
 import org.junit.Test;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
+
+import java.util.Locale;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -128,12 +132,51 @@ public class AstronomicalTest {
 
   @Test
   public void testSolarTime() {
-    // TODO
+    /*
+     * Comparison values generated from
+     * http://aa.usno.navy.mil/rstt/onedaytable?form=1&ID=AA&year=2015&month=7&day=12&state=NC&place=raleigh
+     */
+
+    final Coordinates coordinates = new Coordinates(35 + 47.0/60.0, -78 - 39.0/60.0);
+    final SolarTime solar = new SolarTime(LocalDate.of(2015, 7, 12), coordinates);
+
+    final double transit = solar.transit;
+    final double sunrise = solar.sunrise;
+    final double sunset = solar.sunset;
+    final double twilightStart = solar.hourAngle(-6, /* afterTransit */ false);
+    final double twilightEnd = solar.hourAngle(-6, /* afterTransit */ true);
+    final double invalid = solar.hourAngle(-36, /* afterTransit */ true);
+    assertThat(timeString(twilightStart)).isEqualTo("9:38");
+    assertThat(timeString(sunrise)).isEqualTo("10:08");
+    assertThat(timeString(transit)).isEqualTo("17:20");
+    assertThat(timeString(sunset)).isEqualTo("24:32");
+    assertThat(timeString(twilightEnd)).isEqualTo("25:02");
+    assertThat(timeString(invalid)).isEqualTo("");
+  }
+
+  private String timeString(double when) {
+    final TimeComponents components = DoubleUtil.timeComponents(when);
+    if (components == null) {
+      return "";
+    }
+
+    final int minutes = (int) (components.minutes + Math.round(components.seconds / 60.0));
+    return String.format(Locale.US, "%d:%02d", components.hours, minutes);
   }
 
   @Test
   public void testCalendricalDate() {
-    // TODO
+    // generated from http://aa.usno.navy.mil/data/docs/RS_OneYear.php for KUKUIHAELE, HAWAII
+    final Coordinates coordinates = new Coordinates(
+        /* latitude */ 20 + 7.0/60.0, /* longitude */ -155.0 - 34.0/60.0);
+    final SolarTime day1solar = new SolarTime(LocalDate.of(2015, 4, /* day */ 2), coordinates);
+    final SolarTime day2solar = new SolarTime(LocalDate.of(2015, 4, 3), coordinates);
+
+    final double day1 = day1solar.sunrise;
+    final double day2 = day2solar.sunrise;
+
+    assertThat(timeString(day1)).isEqualTo("16:15");
+    assertThat(timeString(day2)).isEqualTo("16:14");
   }
 
   @Test
@@ -147,8 +190,8 @@ public class AstronomicalTest {
   @Test
   public void testJulianDay() {
     /*
-    Comparison values generated from http://aa.usno.navy.mil/data/docs/JulianDate.php
-    */
+     * Comparison values generated from http://aa.usno.navy.mil/data/docs/JulianDate.php
+     */
 
     assertThat(CalendricalHelper.julianDay(/* year */ 2010, /* month */ 1, /* day */ 2))
         .isWithin(0.00001).of(2455198.500000);
@@ -180,15 +223,9 @@ public class AstronomicalTest {
         CalendricalHelper.julianDay(/* year */ 2015, /* month */ 7, /* day */ 12, /* hours */ 4.25))
         .isWithin(0.000001).of(jdVal);
 
-    /* TODO fix this once we decide on what to use for Calendar (joda time or java 6 apis)
-    let components = NSDateComponents()
-    components.year = 2015
-    components.month = 7
-    components.day = 12
-    components.hour = 4
-    components.minute = 15
-    XCTAssertEqualWithAccuracy(components.julianDate(), jdVal, accuracy: 0.000001)
-    */
+    LocalDateTime components = LocalDateTime.of(/* year */ 2015, /* month */ 7, /* day */ 12,
+        /* hour */ 4, /* minute */ 15);
+    assertThat(CalendricalHelper.julianDay(components)).isWithin(0.000001).of(jdVal);
 
     assertThat(CalendricalHelper
         .julianDay(/* year */ 2015, /* month */ 7, /* day */ 12, /* hours */ 8.0))

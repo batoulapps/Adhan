@@ -20,6 +20,9 @@
         <!-- compilation -->
         <java.version>1.7</java.version>
 
+        <!-- dependencies -->
+        <threeten.version>1.3.1</threeten.version>
+
         <!-- test dependencies -->
         <junit.version>4.12</junit.version>
         <truth.version>0.27</truth.version>
@@ -28,11 +31,17 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.threeten</groupId>
+                <artifactId>threetenbp</artifactId>
+                <version>${threeten.version}</version>
+            </dependency>
+
+            <!-- test dependencies -->
+            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
