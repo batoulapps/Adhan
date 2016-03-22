@@ -31,7 +31,7 @@ public class AstronomicalTest {
     final double λ = Astronomical.apparentSolarLongitude(
         /* julianCentury */ T, /* meanLongitude */ L0);
     final double δ = solar.declination;
-    final double α = solar.rightAscension;
+    final double α = DoubleUtil.unwindAngle(solar.rightAscension);
 
     assertThat(T).isWithin(0.00000000001).of(-0.072183436);
 
@@ -85,6 +85,20 @@ public class AstronomicalTest {
     assertThat(ε0).isWithin(0.000001).of(23.4409463889);
 
     assertThat(ε).isWithin(0.00001).of(23.4435694444);
+  }
+
+  @Test
+  public void testRightAscensionEdgeCase() {
+    final Coordinates coordinates = new Coordinates(35 + 47.0/60.0, -78 - 39.0/60.0);
+    final SolarTime solar = new SolarTime(LocalDate.of(2016, 3, 21), coordinates);
+
+    final double twilightStart = solar.hourAngle(-6, /* afterTransit */ false);
+    final double twilightEnd = solar.hourAngle(-6, /* afterTransit */ true);
+    assertThat(timeString(twilightStart)).isEqualTo("10:51");
+    assertThat(timeString(solar.sunrise)).isEqualTo("11:16");
+    assertThat(timeString(solar.transit)).isEqualTo("17:22");
+    assertThat(timeString(solar.sunset)).isEqualTo("23:28");
+    assertThat(timeString(twilightEnd)).isEqualTo("23:53");
   }
 
   @Test
