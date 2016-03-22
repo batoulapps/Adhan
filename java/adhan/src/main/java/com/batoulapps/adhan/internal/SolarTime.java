@@ -6,20 +6,20 @@ import com.batoulapps.adhan.ShadowLength;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.ChronoUnit;
 
-class SolarTime {
+public class SolarTime {
 
   final LocalDate date;
   final Coordinates observer;
   final SolarCoordinates solar;
-  final double transit;
-  final double sunrise;
-  final double sunset;
+  public final double transit;
+  public final double sunrise;
+  public final double sunset;
 
   private final SolarCoordinates prevSolar;
   private final SolarCoordinates nextSolar;
   private double approximateTransit;
 
-  SolarTime(LocalDate date, Coordinates coordinates) {
+  public SolarTime(LocalDate date, Coordinates coordinates) {
     final LocalDate today = LocalDate.from(date);
     final LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
     final LocalDate yesterday = today.minus(1, ChronoUnit.DAYS);
@@ -47,7 +47,7 @@ class SolarTime {
         prevSolar.declination, nextSolar.declination);
   }
 
-  double hourAngle(double angle, boolean afterTransit) {
+  public double hourAngle(double angle, boolean afterTransit) {
     return Astronomical.correctedHourAngle(this.approximateTransit, angle, this.observer,
         afterTransit, this.solar.apparentSiderealTime, this.solar.rightAscension,
         this.prevSolar.rightAscension, this.nextSolar.rightAscension, this.solar.declination,
@@ -55,7 +55,7 @@ class SolarTime {
   }
 
   // hours from transit
-  double afternoon(ShadowLength shadowLength) {
+  public double afternoon(ShadowLength shadowLength) {
     // TODO (from Swift version) source shadow angle calculation
     final double tangent = Math.abs(observer.latitude - solar.declination);
     final double inverse = shadowLength.getShadowLength() + Math.tan(Math.toRadians(tangent));

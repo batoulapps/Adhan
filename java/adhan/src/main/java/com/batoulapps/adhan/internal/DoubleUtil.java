@@ -1,6 +1,6 @@
 package com.batoulapps.adhan.internal;
 
-class DoubleUtil {
+public class DoubleUtil {
 
   static double normalizeWithBound(double value, double max) {
     return value - (max * (Math.floor(value / max)));
@@ -10,7 +10,7 @@ class DoubleUtil {
     return normalizeWithBound(value, 360);
   }
 
-  static TimeComponents timeComponents(double value) {
+  public static TimeComponents timeComponents(double value) {
     if (Double.isInfinite(value) || Double.isNaN(value)) {
       return null;
     }
