@@ -3,6 +3,7 @@ package com.batoulapps.adhan.internal;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.Year;
+import org.threeten.bp.ZonedDateTime;
 
 public class CalendricalHelper {
 
@@ -82,12 +83,12 @@ public class CalendricalHelper {
   }
 
   /**
-   * Local date and time with a rounded minute
+   * Zoned date and time with a rounded minute
    * This returns a date with the seconds rounded and added to the minute
    * @param when the date and time
    * @return the date and time with 0 seconds and minutes including rounded seconds
    */
-  public static LocalDateTime roundedMinute(LocalDateTime when) {
+  public static ZonedDateTime roundedMinute(ZonedDateTime when) {
     final double minute = when.getMinute();
     final double second = when.getSecond();
     return when.withMinute((int) (minute + Math.round(second / 60))).withSecond(0);

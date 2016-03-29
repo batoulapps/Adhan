@@ -15,12 +15,12 @@ import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.temporal.ChronoUnit;
 
 public class PrayerTimes {
-  public final LocalDateTime fajr;
-  public final LocalDateTime sunrise;
-  public final LocalDateTime dhuhr;
-  public final LocalDateTime asr;
-  public final LocalDateTime maghrib;
-  public final LocalDateTime isha;
+  public final ZonedDateTime fajr;
+  public final ZonedDateTime sunrise;
+  public final ZonedDateTime dhuhr;
+  public final ZonedDateTime asr;
+  public final ZonedDateTime maghrib;
+  public final ZonedDateTime isha;
 
   public PrayerTimes(Coordinates coordinates, LocalDate date, CalculationParameters parameters) {
     ZonedDateTime tempFajr = null;
@@ -154,19 +154,17 @@ public class PrayerTimes {
     } else {
       // Assign final times to public struct members with all offsets
       this.fajr = CalendricalHelper.roundedMinute(
-          tempFajr.plus(parameters.adjustments.fajr, ChronoUnit.MINUTES).toLocalDateTime());
+          tempFajr.plus(parameters.adjustments.fajr, ChronoUnit.MINUTES));
       this.sunrise = CalendricalHelper.roundedMinute(
-          tempSunrise.plus(parameters.adjustments.sunrise, ChronoUnit.MINUTES).toLocalDateTime());
+          tempSunrise.plus(parameters.adjustments.sunrise, ChronoUnit.MINUTES));
       this.dhuhr = CalendricalHelper.roundedMinute(
-          tempDhuhr.plus(parameters.adjustments.dhuhr, ChronoUnit.MINUTES)
-              .plus(dhuhrOffset).toLocalDateTime());
+          tempDhuhr.plus(parameters.adjustments.dhuhr, ChronoUnit.MINUTES).plus(dhuhrOffset));
       this.asr = CalendricalHelper.roundedMinute(
-          tempAsr.plus(parameters.adjustments.asr, ChronoUnit.MINUTES).toLocalDateTime());
+          tempAsr.plus(parameters.adjustments.asr, ChronoUnit.MINUTES));
       this.maghrib = CalendricalHelper.roundedMinute(
-          tempMaghrib.plus(parameters.adjustments.maghrib, ChronoUnit.MINUTES)
-              .plus(maghribOffset).toLocalDateTime());
+          tempMaghrib.plus(parameters.adjustments.maghrib, ChronoUnit.MINUTES).plus(maghribOffset));
       this.isha = CalendricalHelper.roundedMinute(
-          tempIsha.plus(parameters.adjustments.isha, ChronoUnit.MINUTES).toLocalDateTime());
+          tempIsha.plus(parameters.adjustments.isha, ChronoUnit.MINUTES));
     }
   }
 
