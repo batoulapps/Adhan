@@ -5,6 +5,7 @@ import com.batoulapps.adhan.Coordinates;
 import org.junit.Test;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.temporal.ChronoUnit;
 
 import java.util.Locale;
 
@@ -89,16 +90,20 @@ public class AstronomicalTest {
 
   @Test
   public void testRightAscensionEdgeCase() {
+    SolarTime previousTime = null;
     final Coordinates coordinates = new Coordinates(35 + 47.0/60.0, -78 - 39.0/60.0);
-    final SolarTime solar = new SolarTime(LocalDate.of(2016, 3, 21), coordinates);
+    for (int i = 0; i < 365; i++) {
+      SolarTime time = new SolarTime(LocalDate.of(2016, 1, 1).plus(i, ChronoUnit.DAYS), coordinates);
+      if (i > 0) {
+        // transit from one day to another should not differ more than one minute
+        assertThat(Math.abs(time.transit - previousTime.transit)).isLessThan(1.0/60.0);
 
-    final double twilightStart = solar.hourAngle(-6, /* afterTransit */ false);
-    final double twilightEnd = solar.hourAngle(-6, /* afterTransit */ true);
-    assertThat(timeString(twilightStart)).isEqualTo("10:51");
-    assertThat(timeString(solar.sunrise)).isEqualTo("11:16");
-    assertThat(timeString(solar.transit)).isEqualTo("17:22");
-    assertThat(timeString(solar.sunset)).isEqualTo("23:28");
-    assertThat(timeString(twilightEnd)).isEqualTo("23:53");
+        // sunrise and sunset from one day to another should not differ more than two minutes
+        assertThat(Math.abs(time.sunrise - previousTime.sunrise)).isLessThan(2.0/60.0);
+        assertThat(Math.abs(time.sunset - previousTime.sunset)).isLessThan(2.0/60.0);
+      }
+      previousTime = time;
+    }
   }
 
   @Test
@@ -199,6 +204,21 @@ public class AstronomicalTest {
     final double interpolatedValue = Astronomical.interpolate(/* value */ 0.877366,
         /* previousValue */ 0.884226, /* nextValue */ 0.870531, /* factor */ 4.35/24);
     assertThat(interpolatedValue).isWithin(0.000001).of(0.876125);
+
+    final double i1 = Astronomical.interpolate(
+        /* value */ 1, /* previousValue */ -1, /* nextValue */ 3, /* factor */ 0.6);
+    assertThat(i1).isWithin(0.000001).of(2.2);
+  }
+
+  @Test
+  public void testAngleInterpolation() {
+    final double i1 = Astronomical.interpolateAngles(/* value */ 1, /* previousValue */ -1,
+        /* nextValue */ 3, /* factor */ 0.6);
+    assertThat(i1).isWithin(0.000001).of(2.2);
+
+    final double i2 = Astronomical.interpolateAngles(/* value */ 1, /* previousValue */ 359,
+        /* nextValue */ 3, /* factor */ 0.6);
+    assertThat(i2).isWithin(0.000001).of(2.2);
   }
 
   @Test

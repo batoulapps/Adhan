@@ -35,6 +35,22 @@ public class MathTest {
     assertThat(DoubleUtil.unwindAngle(360.0)).isWithin(0.00001).of(0);
     assertThat(DoubleUtil.unwindAngle(259.0)).isWithin(0.00001).of(259);
     assertThat(DoubleUtil.unwindAngle(2592.0)).isWithin(0.00001).of(72);
+
+    assertThat(DoubleUtil.normalizeWithBound(360.1, 360)).isWithin(0.01).of(0.1);
+  }
+
+  @Test
+  public void testClosestAngle() {
+    assertThat(DoubleUtil.closestAngle(360.0)).isWithin(0.000001).of(0);
+    assertThat(DoubleUtil.closestAngle(361.0)).isWithin(0.000001).of(1);
+    assertThat(DoubleUtil.closestAngle(1.0)).isWithin(0.000001).of(1);
+    assertThat(DoubleUtil.closestAngle(-1.0)).isWithin(0.000001).of(-1);
+    assertThat(DoubleUtil.closestAngle(-181.0)).isWithin(0.000001).of(179);
+    assertThat(DoubleUtil.closestAngle(180.0)).isWithin(0.000001).of(180);
+    assertThat(DoubleUtil.closestAngle(359.0)).isWithin(0.000001).of(-1);
+    assertThat(DoubleUtil.closestAngle(-359.0)).isWithin(0.000001).of(1);
+    assertThat(DoubleUtil.closestAngle(1261.0)).isWithin(0.000001).of(-179);
+    assertThat(DoubleUtil.closestAngle(-360.1)).isWithin(0.01).of(-0.1);
   }
 
   @Test
