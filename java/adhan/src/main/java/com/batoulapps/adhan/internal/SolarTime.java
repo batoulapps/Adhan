@@ -3,26 +3,32 @@ package com.batoulapps.adhan.internal;
 import com.batoulapps.adhan.Coordinates;
 import com.batoulapps.adhan.ShadowLength;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class SolarTime {
 
-  final LocalDate date;
-  final Coordinates observer;
-  final SolarCoordinates solar;
   public final double transit;
   public final double sunrise;
   public final double sunset;
 
+  private final Coordinates observer;
+  private final SolarCoordinates solar;
   private final SolarCoordinates prevSolar;
   private final SolarCoordinates nextSolar;
   private double approximateTransit;
 
-  public SolarTime(LocalDate date, Coordinates coordinates) {
-    final LocalDate today = LocalDate.from(date);
-    final LocalDate tomorrow = today.plus(1, ChronoUnit.DAYS);
-    final LocalDate yesterday = today.minus(1, ChronoUnit.DAYS);
+  public SolarTime(Date today, Coordinates coordinates) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    calendar.setTime(today);
+
+    calendar.add(Calendar.DATE, 1);
+    final Date tomorrow = calendar.getTime();
+
+    calendar.add(Calendar.DATE, -2);
+    final Date yesterday = calendar.getTime();
 
     this.prevSolar = new SolarCoordinates(CalendricalHelper.julianDay(yesterday));
     this.solar = new SolarCoordinates(CalendricalHelper.julianDay(today));
@@ -32,7 +38,6 @@ public class SolarTime {
         solar.apparentSiderealTime, solar.rightAscension);
     final double solarAltitude = -50.0 / 60.0;
 
-    this.date = date;
     this.observer = coordinates;
     this.transit = Astronomical.correctedTransit(this.approximateTransit, coordinates.longitude,
         solar.apparentSiderealTime, solar.rightAscension, prevSolar.rightAscension,

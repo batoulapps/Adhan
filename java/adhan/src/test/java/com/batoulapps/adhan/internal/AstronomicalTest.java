@@ -3,10 +3,9 @@ package com.batoulapps.adhan.internal;
 import com.batoulapps.adhan.Coordinates;
 
 import org.junit.Test;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.temporal.ChronoUnit;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -93,7 +92,8 @@ public class AstronomicalTest {
     SolarTime previousTime = null;
     final Coordinates coordinates = new Coordinates(35 + 47.0/60.0, -78 - 39.0/60.0);
     for (int i = 0; i < 365; i++) {
-      SolarTime time = new SolarTime(LocalDate.of(2016, 1, 1).plus(i, ChronoUnit.DAYS), coordinates);
+      SolarTime time = new SolarTime(
+          TestUtils.makeDateWithOffset(2016, 1, 1, i, Calendar.DAY_OF_YEAR), coordinates);
       if (i > 0) {
         // transit from one day to another should not differ more than one minute
         assertThat(Math.abs(time.transit - previousTime.transit)).isLessThan(1.0/60.0);
@@ -157,7 +157,7 @@ public class AstronomicalTest {
      */
 
     final Coordinates coordinates = new Coordinates(35 + 47.0/60.0, -78 - 39.0/60.0);
-    final SolarTime solar = new SolarTime(LocalDate.of(2015, 7, 12), coordinates);
+    final SolarTime solar = new SolarTime(TestUtils.makeDate(2015, 7, 12), coordinates);
 
     final double transit = solar.transit;
     final double sunrise = solar.sunrise;
@@ -188,8 +188,8 @@ public class AstronomicalTest {
     // generated from http://aa.usno.navy.mil/data/docs/RS_OneYear.php for KUKUIHAELE, HAWAII
     final Coordinates coordinates = new Coordinates(
         /* latitude */ 20 + 7.0/60.0, /* longitude */ -155.0 - 34.0/60.0);
-    final SolarTime day1solar = new SolarTime(LocalDate.of(2015, 4, /* day */ 2), coordinates);
-    final SolarTime day2solar = new SolarTime(LocalDate.of(2015, 4, 3), coordinates);
+    final SolarTime day1solar = new SolarTime(TestUtils.makeDate(2015, 4, /* day */ 2), coordinates);
+    final SolarTime day2solar = new SolarTime(TestUtils.makeDate(2015, 4, 3), coordinates);
 
     final double day1 = day1solar.sunrise;
     final double day2 = day2solar.sunrise;
@@ -257,7 +257,7 @@ public class AstronomicalTest {
         CalendricalHelper.julianDay(/* year */ 2015, /* month */ 7, /* day */ 12, /* hours */ 4.25))
         .isWithin(0.000001).of(jdVal);
 
-    LocalDateTime components = LocalDateTime.of(/* year */ 2015, /* month */ 7, /* day */ 12,
+    Date components = TestUtils.makeDate(/* year */ 2015, /* month */ 7, /* day */ 12,
         /* hour */ 4, /* minute */ 15);
     assertThat(CalendricalHelper.julianDay(components)).isWithin(0.000001).of(jdVal);
 

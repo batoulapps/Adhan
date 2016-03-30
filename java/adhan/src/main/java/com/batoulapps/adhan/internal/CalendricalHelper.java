@@ -1,9 +1,9 @@
 package com.batoulapps.adhan.internal;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.Year;
-import org.threeten.bp.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class CalendricalHelper {
 
@@ -20,22 +20,15 @@ public class CalendricalHelper {
 
   /**
    * The Julian Day for a given date
-   * @param localDate the date
+   * @param date the date
    * @return the julian day
    */
-  static double julianDay(LocalDate localDate) {
-    return julianDay(localDate.getYear(),
-        localDate.getMonthValue(), localDate.getDayOfMonth(), 0.0);
-  }
-
-  /**
-   * The Julian Day for a given date and time
-   * @param localDateTime the date and time
-   * @return the julian day
-   */
-  static double julianDay(LocalDateTime localDateTime) {
-    return julianDay(localDateTime.getYear(), localDateTime.getMonthValue(),
-        localDateTime.getDayOfMonth(), localDateTime.getHour() + localDateTime.getMinute() / 60.0);
+  static double julianDay(Date date) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    calendar.setTime(date);
+    return julianDay(calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+        calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE) / 60.0);
   }
 
   /**
@@ -78,19 +71,60 @@ public class CalendricalHelper {
    * @param year the year
    * @return whether or not its a leap year
    */
-  static boolean isLeapYear(int year) {
-    return Year.isLeap(year);
+  public static boolean isLeapYear(int year) {
+    return year % 4 == 0 && !(year % 100 == 0 && year % 400 != 0);
   }
 
   /**
-   * Zoned date and time with a rounded minute
+   * Date and time with a rounded minute
    * This returns a date with the seconds rounded and added to the minute
    * @param when the date and time
    * @return the date and time with 0 seconds and minutes including rounded seconds
    */
-  public static ZonedDateTime roundedMinute(ZonedDateTime when) {
-    final double minute = when.getMinute();
-    final double second = when.getSecond();
-    return when.withMinute((int) (minute + Math.round(second / 60))).withSecond(0);
+  public static Date roundedMinute(Date when) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    calendar.setTime(when);
+    double minute = calendar.get(Calendar.MINUTE);
+    double second = calendar.get(Calendar.SECOND);
+    calendar.set(Calendar.MINUTE, (int) (minute + Math.round(second / 60)));
+    calendar.set(Calendar.SECOND, 0);
+    return calendar.getTime();
+  }
+
+  /**
+   * Gets a date for the particular date
+   * @param year the year
+   * @param month the month
+   * @param day the day
+   * @return the date with a time set to 00:00:00 at utc
+   */
+  public static Date resolveTime(int year, int month, int day) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    //noinspection MagicConstant
+    calendar.set(year, month - 1, day, 0, 0, 0);
+    return calendar.getTime();
+  }
+
+  /**
+   * Gets a date for the particular date
+   * @param components the date components
+   * @return the date with a time set to 00:00:00 at utc
+   */
+  public static Date resolveTime(DateComponents components) {
+    return resolveTime(components.year, components.month, components.day);
+  }
+
+  /**
+   * Add an offset to a particular day
+   * @param when the original date
+   * @param amount the amount to add
+   * @param field the field to add it to (from {@link java.util.Calendar}'s fields).
+   * @return the date with the offset added
+   */
+  public static Date add(Date when, int amount, int field) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    calendar.setTime(when);
+    calendar.add(field, amount);
+    return calendar.getTime();
   }
 }

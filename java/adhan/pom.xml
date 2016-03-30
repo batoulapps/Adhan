@@ -12,11 +12,6 @@
     <artifactId>adhan</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threetenbp</artifactId>
-        </dependency>
-
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>
