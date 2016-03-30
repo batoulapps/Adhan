@@ -22,4 +22,11 @@ public class DoubleUtil {
     // intentionally not using LocalTime because hours can be >= 24.
     return new TimeComponents((int) hours, (int) minutes, (int) seconds);
   }
+
+  static double closestAngle(double angle) {
+    if (angle >= -180 && angle <= 180) {
+      return angle;
+    }
+    return angle - (360 * Math.round(angle / 360));
+  }
 }

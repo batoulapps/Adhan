@@ -195,7 +195,7 @@ class Astronomical {
   static double approximateTransit(double L, double Θ0, double α2) {
     /* Equation from page Astronomical Algorithms 102 */
     final double Lw = L * -1;
-    return DoubleUtil.normalizeWithBound((DoubleUtil.unwindAngle(α2) + Lw - Θ0) / 360, 1);
+    return DoubleUtil.normalizeWithBound((α2 + Lw - Θ0) / 360, 1);
   }
 
   /**
@@ -212,10 +212,10 @@ class Astronomical {
         /* Equation from page Astronomical Algorithms 102 */
     final double Lw = L * -1;
     final double θ = DoubleUtil.unwindAngle(Θ0 + (360.985647 * m0));
-    final double α = DoubleUtil.unwindAngle(
-        interpolate(/* value */ α2, /* previousValue */ α1, /* nextValue */ α3, /* factor */ m0));
-    final double H = (θ - Lw - α);
-    final double Δm = (H >= -180 && H <= 180) ? H / -360 : 0;
+    final double α = DoubleUtil.unwindAngle(interpolateAngles(
+            /* value */ α2, /* previousValue */ α1, /* nextValue */ α3, /* factor */ m0));
+    final double H = DoubleUtil.closestAngle(θ - Lw - α);
+    final double Δm = H / -360;
     return (m0 + Δm) * 24;
   }
 
@@ -244,8 +244,8 @@ class Astronomical {
     final double H0 = Math.toDegrees(Math.acos(term1 / term2));
     final double m = afterTransit ? m0 + (H0 / 360) : m0 - (H0 / 360);
     final double θ = DoubleUtil.unwindAngle(Θ0 + (360.985647 * m));
-    final double α = DoubleUtil.unwindAngle(
-        interpolate(/* value */ α2, /* previousValue */ α1, /* nextValue */ α3, /* factor */ m));
+    final double α = DoubleUtil.unwindAngle(interpolateAngles(
+        /* value */ α2, /* previousValue */ α1, /* nextValue */ α3, /* factor */ m));
     final double δ = interpolate(/* value */ δ2, /* previousValue */ δ1,
         /* nextValue */ δ3, /* factor */ m);
     final double H = (θ - Lw - α);
@@ -275,6 +275,22 @@ class Astronomical {
     /* Equation from Astronomical Algorithms page 24 */
     final double a = y2 - y1;
     final double b = y3 - y2;
+    final double c = b - a;
+    return y2 + ((n/2) * (a + b + (n * c)));
+  }
+
+  /**
+   * Interpolation of three angles, accounting for angle unwinding
+   * @param y2 value
+   * @param y1 previousValue
+   * @param y3 nextValue
+   * @param n factor
+   * @return interpolated angle
+   */
+  static double interpolateAngles(double y2, double y1, double y3, double n) {
+    /* Equation from Astronomical Algorithms page 24 */
+    final double a = DoubleUtil.unwindAngle(y2 - y1);
+    final double b = DoubleUtil.unwindAngle(y3 - y2);
     final double c = b - a;
     return y2 + ((n/2) * (a + b + (n * c)));
   }

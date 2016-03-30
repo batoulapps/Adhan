@@ -44,7 +44,8 @@ class SolarCoordinates {
     this.declination = Math.toDegrees(Math.asin(Math.sin(εapp) * Math.sin(λ)));
 
         /* Equation from Astronomical Algorithms page 165 */
-    this.rightAscension = Math.toDegrees(Math.atan2(Math.cos(εapp) * Math.sin(λ), Math.cos(λ)));
+    this.rightAscension = DoubleUtil.unwindAngle(
+        Math.toDegrees(Math.atan2(Math.cos(εapp) * Math.sin(λ), Math.cos(λ))));
 
         /* Equation from Astronomical Algorithms page 88 */
     this.apparentSiderealTime = θ0 + (((ΔΨ * 3600) * Math.cos(Math.toRadians(ε0 + Δε))) / 3600);
