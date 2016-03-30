@@ -9,7 +9,9 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>adhan-core</module>
         <module>adhan</module>
+        <module>adhan-android</module>
         <module>samples</module>
     </modules>
 
@@ -22,6 +24,7 @@
 
         <!-- dependencies -->
         <threeten.version>1.3.1</threeten.version>
+        <androidthreeten.version>1.0.3</androidthreeten.version>
 
         <!-- test dependencies -->
         <junit.version>4.12</junit.version>
@@ -35,6 +38,12 @@
                 <artifactId>threetenbp</artifactId>
                 <version>${threeten.version}</version>
             </dependency>
+
+				<dependency>
+					<groupId>com.jakewharton.threetenabp</groupId>
+					<artifactId>threetenabp</artifactId>
+					<version>${androidthreeten.version}</version>
+				</dependency>
 
             <!-- test dependencies -->
             <dependency>
