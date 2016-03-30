@@ -3,7 +3,6 @@ package com.batoulapps.adhan;
 import org.junit.Test;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZoneId;
-import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -49,7 +48,6 @@ public class PrayerTimesTest {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a")
         .withZone(ZoneId.of("America/New_York"));
-    ZoneId utc = ZoneId.of("UTC");
 
     assertThat(prayerTimes.fajr).isNotNull();
     assertThat(prayerTimes.sunrise).isNotNull();
@@ -58,12 +56,12 @@ public class PrayerTimesTest {
     assertThat(prayerTimes.maghrib).isNotNull();
     assertThat(prayerTimes.isha).isNotNull();
 
-    assertThat(ZonedDateTime.of(prayerTimes.fajr, utc).format(formatter)).isEqualTo("04:42 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.sunrise, utc).format(formatter)).isEqualTo("06:08 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.dhuhr, utc).format(formatter)).isEqualTo("01:21 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.asr, utc).format(formatter)).isEqualTo("06:22 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.maghrib, utc).format(formatter)).isEqualTo("08:32 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.isha, utc).format(formatter)).isEqualTo("09:57 PM");
+    assertThat(prayerTimes.fajr.format(formatter)).isEqualTo("04:42 AM");
+    assertThat(prayerTimes.sunrise.format(formatter)).isEqualTo("06:08 AM");
+    assertThat(prayerTimes.dhuhr.format(formatter)).isEqualTo("01:21 PM");
+    assertThat(prayerTimes.asr.format(formatter)).isEqualTo("06:22 PM");
+    assertThat(prayerTimes.maghrib.format(formatter)).isEqualTo("08:32 PM");
+    assertThat(prayerTimes.isha.format(formatter)).isEqualTo("09:57 PM");
   }
 
   @Test
@@ -73,8 +71,6 @@ public class PrayerTimesTest {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a")
         .withZone(ZoneId.of("America/New_York"));
-    ZoneId utc = ZoneId.of("UTC");
-
     CalculationParameters parameters = CalculationMethod.MUSLIM_WORLD_LEAGUE.getParameters();
 
     PrayerTimes prayerTimes = new PrayerTimes(coordinates, date, parameters);
@@ -85,12 +81,12 @@ public class PrayerTimesTest {
     assertThat(prayerTimes.maghrib).isNotNull();
     assertThat(prayerTimes.isha).isNotNull();
 
-    assertThat(ZonedDateTime.of(prayerTimes.fajr, utc).format(formatter)).isEqualTo("05:35 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.sunrise, utc).format(formatter)).isEqualTo("07:06 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.dhuhr, utc).format(formatter)).isEqualTo("12:05 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.asr, utc).format(formatter)).isEqualTo("02:42 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.maghrib, utc).format(formatter)).isEqualTo("05:01 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.isha, utc).format(formatter)).isEqualTo("06:26 PM");
+    assertThat(prayerTimes.fajr.format(formatter)).isEqualTo("05:35 AM");
+    assertThat(prayerTimes.sunrise.format(formatter)).isEqualTo("07:06 AM");
+    assertThat(prayerTimes.dhuhr.format(formatter)).isEqualTo("12:05 PM");
+    assertThat(prayerTimes.asr.format(formatter)).isEqualTo("02:42 PM");
+    assertThat(prayerTimes.maghrib.format(formatter)).isEqualTo("05:01 PM");
+    assertThat(prayerTimes.isha.format(formatter)).isEqualTo("06:26 PM");
 
     parameters.adjustments.fajr = 10;
     parameters.adjustments.sunrise = 10;
@@ -107,12 +103,12 @@ public class PrayerTimesTest {
     assertThat(prayerTimes.maghrib).isNotNull();
     assertThat(prayerTimes.isha).isNotNull();
 
-    assertThat(ZonedDateTime.of(prayerTimes.fajr, utc).format(formatter)).isEqualTo("05:45 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.sunrise, utc).format(formatter)).isEqualTo("07:16 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.dhuhr, utc).format(formatter)).isEqualTo("12:15 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.asr, utc).format(formatter)).isEqualTo("02:52 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.maghrib, utc).format(formatter)).isEqualTo("05:11 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.isha, utc).format(formatter)).isEqualTo("06:36 PM");
+    assertThat(prayerTimes.fajr.format(formatter)).isEqualTo("05:45 AM");
+    assertThat(prayerTimes.sunrise.format(formatter)).isEqualTo("07:16 AM");
+    assertThat(prayerTimes.dhuhr.format(formatter)).isEqualTo("12:15 PM");
+    assertThat(prayerTimes.asr.format(formatter)).isEqualTo("02:52 PM");
+    assertThat(prayerTimes.maghrib.format(formatter)).isEqualTo("05:11 PM");
+    assertThat(prayerTimes.isha.format(formatter)).isEqualTo("06:36 PM");
 
     parameters.adjustments = new PrayerAdjustments();
     prayerTimes = new PrayerTimes(coordinates, date, parameters);
@@ -123,24 +119,23 @@ public class PrayerTimesTest {
     assertThat(prayerTimes.maghrib).isNotNull();
     assertThat(prayerTimes.isha).isNotNull();
 
-    assertThat(ZonedDateTime.of(prayerTimes.fajr, utc).format(formatter)).isEqualTo("05:35 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.sunrise, utc).format(formatter)).isEqualTo("07:06 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.dhuhr, utc).format(formatter)).isEqualTo("12:05 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.asr, utc).format(formatter)).isEqualTo("02:42 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.maghrib, utc).format(formatter)).isEqualTo("05:01 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.isha, utc).format(formatter)).isEqualTo("06:26 PM");
+    assertThat(prayerTimes.fajr.format(formatter)).isEqualTo("05:35 AM");
+    assertThat(prayerTimes.sunrise.format(formatter)).isEqualTo("07:06 AM");
+    assertThat(prayerTimes.dhuhr.format(formatter)).isEqualTo("12:05 PM");
+    assertThat(prayerTimes.asr.format(formatter)).isEqualTo("02:42 PM");
+    assertThat(prayerTimes.maghrib.format(formatter)).isEqualTo("05:01 PM");
+    assertThat(prayerTimes.isha.format(formatter)).isEqualTo("06:26 PM");
   }
 
   @Test
   public void testMoonsightingMethod() {
-    LocalDate date = LocalDate.of(2106, 1, 31);
+    LocalDate date = LocalDate.of(2016, 1, 31);
     Coordinates coordinates = new Coordinates(35.7750, -78.6336);
     PrayerTimes prayerTimes = new PrayerTimes(
         coordinates, date, CalculationMethod.MOON_SIGHTING_COMMITTEE.getParameters());
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a")
         .withZone(ZoneId.of("America/New_York"));
-    ZoneId utc = ZoneId.of("UTC");
 
     assertThat(prayerTimes.fajr).isNotNull();
     assertThat(prayerTimes.sunrise).isNotNull();
@@ -149,11 +144,11 @@ public class PrayerTimesTest {
     assertThat(prayerTimes.maghrib).isNotNull();
     assertThat(prayerTimes.isha).isNotNull();
 
-    assertThat(ZonedDateTime.of(prayerTimes.fajr, utc).format(formatter)).isEqualTo("05:48 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.sunrise, utc).format(formatter)).isEqualTo("07:16 AM");
-    assertThat(ZonedDateTime.of(prayerTimes.dhuhr, utc).format(formatter)).isEqualTo("12:33 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.asr, utc).format(formatter)).isEqualTo("03:20 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.maghrib, utc).format(formatter)).isEqualTo("05:43 PM");
-    assertThat(ZonedDateTime.of(prayerTimes.isha, utc).format(formatter)).isEqualTo("07:05 PM");
+    assertThat(prayerTimes.fajr.format(formatter)).isEqualTo("05:48 AM");
+    assertThat(prayerTimes.sunrise.format(formatter)).isEqualTo("07:16 AM");
+    assertThat(prayerTimes.dhuhr.format(formatter)).isEqualTo("12:33 PM");
+    assertThat(prayerTimes.asr.format(formatter)).isEqualTo("03:20 PM");
+    assertThat(prayerTimes.maghrib.format(formatter)).isEqualTo("05:43 PM");
+    assertThat(prayerTimes.isha.format(formatter)).isEqualTo("07:05 PM");
   }
 }

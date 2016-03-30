@@ -2,6 +2,8 @@ package com.batoulapps.adhan.internal;
 
 import org.junit.Test;
 import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -67,13 +69,15 @@ public class MathTest {
 
   @Test
   public void testMinuteRounding() {
-    final LocalDateTime comps1 = LocalDateTime.of(2015, 1, 1, 10, 2, 29);
-    final LocalDateTime rounded1 = CalendricalHelper.roundedMinute(comps1);
+    final ZonedDateTime comps1 =
+        ZonedDateTime.of(LocalDateTime.of(2015, 1, 1, 10, 2, 29), ZoneId.of("GMT"));
+    final ZonedDateTime rounded1 = CalendricalHelper.roundedMinute(comps1);
     assertThat(rounded1.getMinute()).isEqualTo(2);
     assertThat(rounded1.getSecond()).isEqualTo(0);
 
-    final LocalDateTime comps2 = LocalDateTime.of(2015, 1, 1, 10, 2, 31);
-    final LocalDateTime rounded2 = CalendricalHelper.roundedMinute(comps2);
+    final ZonedDateTime comps2 =
+        ZonedDateTime.of(LocalDateTime.of(2015, 1, 1, 10, 2, 31), ZoneId.of("GMT"));
+    final ZonedDateTime rounded2 = CalendricalHelper.roundedMinute(comps2);
     assertThat(rounded2.getMinute()).isEqualTo(3);
     assertThat(rounded2.getSecond()).isEqualTo(0);
   }
