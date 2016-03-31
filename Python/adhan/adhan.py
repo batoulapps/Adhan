@@ -1,9 +1,10 @@
-from enum import Enum, DoubleEnum
+from enum import Enum, unique
 import math
 import datetime as dt
 
 
 # Madhab for determining how Asr is calculated
+@unique
 class Madhab(Enum):
     shafi = 1
     hanafi = 2
@@ -15,12 +16,14 @@ class Madhab(Enum):
         }[self]
 
 
-class ShadowLength(DoubleEnum):
-    single = 1.0
-    double = 2.0
+@unique
+class ShadowLength(Enum):
+    single = 1
+    double = 2
 
 
 # Rule for approximating Fajr and Isha at high latitudes
+@unique
 class HighLatitudeRule(Enum):
     middle_of_the_night = 1
     seventh_of_the_night = 2
@@ -69,6 +72,7 @@ class CalculationParameters:
 
 
 # Preset calculation parameters
+@unique
 class CalculationMethod(Enum):
     muslim_world_league = 1
     egyptian = 2
@@ -109,18 +113,185 @@ class PrayerTimes:
         self.maghrib = None
         self.isha = None
 
+        is_moonsighting = calculation_parameters.method == CalculationMethod.moonsighting_committee
+
+        solar_time = SolarTime(date, coordinates)
+
+        sunrise = date_with_hours(date, solar_time.sunrise)
+        dhuhr = date_with_hours(date, solar_time.transit)
+        maghrib = date_with_hours(date, solar_time.sunset)
+        isha = None
+
+        if not all(sunrise, dhuhr, maghrib):
+            return None
+
+        asr = date_with_hours(date, solar_time.afternoon(calculation_parameters.madhab.shadow_length))
+
+        tomorrow_sunrise = sunrise + dt.timedelta(days=1)
+        if tomorrow_sunrise is None:
+            return None
+
+        night_duration = tomorrow_sunrise - maghrib
+
+        fajr = self.__calculate_fajr(coordinates, date, calculation_parameters, solar_time, sunrise, night_duration)
+        isha = self.__calculate_isha(coordinates, date, calculation_parameters, solar_time, sunrise, night_duration)
+
+        # Moonsighting Committee requires 5 minutes for the sun
+        # to pass the zenith and dhuhr to enter
+        # Default behavior waits 1 minute for the sun to pass
+        # the zenith and dhuhr to enter
+        dhuhr_offset = 300 if is_moonsighting else 60
+
+        # Moonsighting Committee adds 3 minutes to sunset time
+        # to account for light refraction
+        maghrib_offset = 180 if is_moonsighting else 0
+
+        if not all(fajr, sunrise, dhuhr, asr, maghrib, isha):
+            return None
+
+        self.fajr = rounded_minute(fajr + dt.timedelta(minutes=calculation_parameters.adjustments.fajr))
+        self.sunrise = rounded_minute(sunrise + dt.timedelta(minutes=calculation_parameters.adjustments.sunrise))
+        self.dhuhr = rounded_minute(dhuhr + dt.timedelta(minutes=calculation_parameters.adjustments.dhuhr + dhuhr_offset))
+        self.asr = rounded_minute(asr + dt.timedelta(minutes=calculation_parameters.adjustments.asr))
+        self.maghrib = rounded_minute(maghrib + dt.timedelta(minutes=calculation_parameters.adjustments.maghrib + maghrib_offset))
+        self.isha = rounded_minute(isha + dt.timedelta(minutes=calculation_parameters.adjustments.isha))
+
+    @classmethod
+    def __calculate_fajr(cls, coordinates, date, calculation_parameters, solar_time, sunrise, night_duration):
+        fajr = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.fajr_angle, False))
+
+        # fajr check against safe value
+        safe_fajr = None
+        if calculation_parameters.method == CalculationMethod.moonsighting_committee:
+            if coordinates.latitude < 55:
+                safe_fajr = cls.season_adjusted_fajr(coordinates.latitude, date, sunrise)
+            else:
+                night_fration = night_duration / 7
+                safe_fajr = sunrise - night_fration
+        else:
+            fajr_portion, isha_portion = calculation_parameters.night_portions()
+            night_fration = night_duration * fajr_portion
+            safe_fajr = sunrise - night_fration
+
+        if fajr is None or (fajr - safe_fajr).total_seconds() > 0:
+            fajr = safe_fajr
+
+        return fajr
+
+    @classmethod
+    def __calculate_isha(cls, coordinates, date, calculation_parameters, solar_time, sunset, night_duration):
+        # isha calcuation w/ check against safe value
+        if calculation_parameters.isha_interval > 0:
+            isha = sunset + dt.timedelta(minutes=calculation_parameters.isha_interval)
+        else:
+            temp_isha = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.isha_angle, True))
+            if temp_isha is not None:
+                isha = temp_isha
+
+            safe_isha = None
+            if calculation_parameters.method == CalculationMethod.moonsighting_committee:
+                if coordinates.latitude < 55:
+                    safe_isha = cls.season_adjusted_isha(coordinates.latitude, date, sunset)
+                else:
+                    night_fration = night_duration / 7
+                    safe_isha = sunset + night_fration
+            else:
+                fajr_portion, isha_portion = calculation_parameters.night_portions()
+                night_fration = night_duration * isha_portion
+                safe_isha = sunset + night_fration
+
+            if isha is None or (isha - safe_isha).total_seconds() < 0:
+                isha = safe_isha
+
+    @classmethod
+    def season_adjusted_fajr(cls, latitude, date, sunrise):
+        a = 75 + 28.65 / 55.0 * math.fabs(latitude)
+        b = 75 + 19.44 / 55.0 * math.fabs(latitude)
+        c = 75 + 32.74 / 55.0 * math.fabs(latitude)
+        d = 75 + 48.10 / 55.0 * math.fabs(latitude)
+
+        dyy = cls.days_since_solstice(latitude, date)
+        if dyy < 91:
+            adjustment = a + (b - a) / 91.0 * dyy
+        elif dyy < 137:
+            adjustment = b + (c - b) / 46.0 * (dyy - 91)
+        elif dyy < 183:
+            adjustment = c + (d - c) / 46.0 * (dyy - 137)
+        elif dyy < 229:
+            adjustment = d + (c - d) / 46.0 * (dyy - 183)
+        elif dyy < 275:
+            adjustment = c + (b - c) / 46.0 * (dyy - 229)
+        else:
+            adjustment = b + (a - b) / 91.0 * (dyy - 275)
+
+        return sunrise + dt.timedelta(math.floor(adjustment) * -60)
+
+    @classmethod
+    def season_adjusted_isha(cls, latitude, date, sunrise):
+        a = 75 + 28.65 / 55.0 * math.fabs(latitude)
+        b = 75 + 19.44 / 55.0 * math.fabs(latitude)
+        c = 75 + 32.74 / 55.0 * math.fabs(latitude)
+        d = 75 + 48.10 / 55.0 * math.fabs(latitude)
+
+        dyy = cls.days_since_solstice(latitude, date)
+        if dyy < 91:
+            adjustment = a + (b - a) / 91.0 * dyy
+        elif dyy < 137:
+            adjustment = b + (c - b) / 46.0 * (dyy - 91)
+        elif dyy < 183:
+            adjustment = c + (d - c) / 46.0 * (dyy - 137)
+        elif dyy < 229:
+            adjustment = d + (c - d) / 46.0 * (dyy - 183)
+        elif dyy < 275:
+            adjustment = c + (b - c) / 46.0 * (dyy - 229)
+        else:
+            adjustment = b + (a - b) / 91.0 * (dyy - 275)
+
+        return sunrise + dt.timedelta(math.ceil(adjustment) * 60)
+
+    @classmethod
+    def days_since_solstice(cls, latitude, date):
+        year = date.year
+        day_of_year = date.timetuple().tm_yday
+        days_since_solstice = 0
+        northern_offset = 10
+        southern_offset = 173 if is_leap_year(year) else 172
+        days_in_year = 366 if is_leap_year(year) else 365
+
+        if latitude >= 0:
+            days_since_solstice = day_of_year + northern_offset
+            if days_since_solstice >= days_in_year:
+                days_since_solstice = days_since_solstice - days_in_year
+        else:
+            days_since_solstice = day_of_year - southern_offset
+            if days_since_solstice < 0:
+                days_since_solstice = days_since_solstice + days_in_year
+
+        return days_since_solstice
+
 
 def normalize(angle, bound):
     normalized = angle - (bound * (math.floor(angle / bound)))
     return normalized if normalized >= 0 else normalized + bound
 
 
-def unwind_angle(angle):
+def unwind_angle_360(angle):
     return normalize(angle, 360)
 
 
+def unwind_angle_180(angle):
+    unwound = unwind_angle_360(angle)
+    return unwound if unwound <= 180 else unwound - 360
+
+
 def rounded_minute(date):
-    return dt.datetime(date.year, date.month, date.hour, int(date.minute + math.round(date.second / 60.0)))
+    return dt.datetime(date.year, date.month, date.day, date.hour, int(date.minute + math.round(date.second / 60.0)))
+
+
+def date_with_hours(date, hours):
+    if (math.isnan(hours)):
+        return None
+    return dt.datetime(date.year, date.month, date.day) + dt.timedelta(hours=hours)
 
 
 # Julian Day Number for a given date
@@ -162,7 +333,7 @@ def mean_solar_longitude(julian_century):
     j = 36000.76983 * T
     k = 0.0003032 * math.pow(T, 2)
     L0 = i + j + k
-    return unwind_angle(L0)
+    return unwind_angle_360(L0)
 
 
 # The geometric mean longitude of the moon in degrees
@@ -173,7 +344,7 @@ def mean_lunar_longitude(julian_century):
     i = 218.3165
     j = 481267.8813 + T
     Lp = i + j
-    return unwind_angle(Lp)
+    return unwind_angle_360(Lp)
 
 
 # The apparent longitude of the Sun, referred to the true equinox of the date.
@@ -186,7 +357,7 @@ def apparent_solar_longitude(julian_century, mean_longitude):
     longitude = L0 + solar_equation_of_the_center(T, M)
     Ω = 125.04 - (1934.136 * T)
     λ = longitude - 0.00569 - (0.00478 * math.sin(math.radians(Ω)))
-    return unwind_angle(λ)
+    return unwind_angle_360(λ)
 
 
 # Equation from Astronomical Algorithms p144
@@ -198,7 +369,7 @@ def ascending_lunar_node_longitude(julian_century):
     k = 0.0020708 * math.pow(T, 2)
     l = math.pow(T, 3) / 450000
     Ω = i - j + k + l
-    return unwind_angle(Ω)
+    return unwind_angle_360(Ω)
 
 
 # The mean anomaly of the sun.
@@ -210,7 +381,7 @@ def mean_solar_anomaly(julian_century):
     j = 35999.05029 * T
     k = 0.0001537 * math.pow(T, 2)
     M = i + j - k
-    return unwind_angle(M)
+    return unwind_angle_360(M)
 
 
 # The Sun's equation of the center in degrees.
@@ -258,7 +429,7 @@ def mean_sidereal_time(julian_century):
     k = 0.000387933 * math.pow(T, 2)
     l = math.pow(T, 3) / 38710000
     θ = i + j + k - l
-    return unwind_angle(θ)
+    return unwind_angle_360(θ)
 
 
 # Equation from Astronomical Algorithms p144
@@ -319,7 +490,7 @@ def corrected_transit(approximate_transit, longitude, sidereal_time, right_ascen
     α3 = next_right_ascension
 
     Lw = L * -1
-    θ = unwind_angle(Θ0 + (360.985647 * m0))
+    θ = unwind_angle_360(Θ0 + (360.985647 * m0))
     α = interpolate(α2, α1, α3, m0)
     H = (θ - Lw - α)
     Δm = H / -360 if (H >= -180 and H <= 180) else 0
@@ -343,7 +514,7 @@ def correctedHourAngle(approximate_transit, angle, coordinates, after_transit, s
     j = math.cos(math.radians(coordinates.latitude)) * math.cos(math.radians(δ2))
     H0 = math.radians(math.acos(i / j))
     m = m0 + (H0 / 360) if after_transit else m0 - (H0 / 360)
-    θ = unwind_angle(Θ0 + (360.985647 * m))
+    θ = unwind_angle_360(Θ0 + (360.985647 * m))
     α = interpolate(α2, α1, α3, m)
     δ = interpolate(δ2, δ1, δ3, m)
     H = (θ - Lw - α)
@@ -386,7 +557,7 @@ class SolarCoordinates:
         self.declination = math.degrees(math.asin(math.sin(εapp) * math.sin(λ)))
 
         # Equation from Astronomical Algorithms p165
-        self.rightAscension = unwind_angle(math.degrees(math.atan2(math.cos(εapp) * math.sin(λ), math.cos(λ))))
+        self.rightAscension = unwind_angle_360(math.degrees(math.atan2(math.cos(εapp) * math.sin(λ), math.cos(λ))))
 
         # Equation from Astronomical Algorithms p88
         self.apparentSiderealTime = θ0 + ((ΔΨ * 3600) * math.cos(math.radians(ε0 + Δε)) / 3600)
@@ -395,8 +566,7 @@ class SolarCoordinates:
 class SolarTime:
     def __init__(self, date, coordinates):
         # Calculations need to occur at 0h0m UTC
-        date.hour = 0
-        date.minute = 0
+        date = dt.datetime(date.year, date.month, date.day)
 
         next_date = date + dt.timedelta(1)
         previous_date = date - dt.timedelta(-1)
