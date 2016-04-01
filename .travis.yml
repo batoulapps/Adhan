@@ -11,5 +11,5 @@ script:
   - xctool -project Swift/Adhan.xcodeproj -scheme AdhanTests -sdk iphonesimulator build test
   - JavaScript/Tests/runtests
   - node-qunit-phantomjs JavaScript/Tests/tests.html
-  - cd Python && python setup.py test
+  - cd Python && python3 setup.py test
 python: 3.5
