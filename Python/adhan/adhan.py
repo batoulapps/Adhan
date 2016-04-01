@@ -215,7 +215,7 @@ class PrayerTimes:
         c = 75 + 32.74 / 55.0 * math.fabs(latitude)
         d = 75 + 48.10 / 55.0 * math.fabs(latitude)
 
-        dyy = cls.days_since_solstice(latitude, date)
+        dyy = days_since_solstice(latitude, date)
         if dyy < 91:
             adjustment = a + (b - a) / 91.0 * dyy
         elif dyy < 137:
@@ -238,7 +238,7 @@ class PrayerTimes:
         c = 75 + 32.74 / 55.0 * math.fabs(latitude)
         d = 75 + 48.10 / 55.0 * math.fabs(latitude)
 
-        dyy = cls.days_since_solstice(latitude, date)
+        dyy = days_since_solstice(latitude, date)
         if dyy < 91:
             adjustment = a + (b - a) / 91.0 * dyy
         elif dyy < 137:
@@ -254,25 +254,25 @@ class PrayerTimes:
 
         return sunrise + dt.timedelta(math.ceil(adjustment) * 60)
 
-    @classmethod
-    def days_since_solstice(cls, latitude, date):
-        year = date.year
-        day_of_year = date.timetuple().tm_yday
-        days_since_solstice = 0
-        northern_offset = 10
-        southern_offset = 173 if is_leap_year(year) else 172
-        days_in_year = 366 if is_leap_year(year) else 365
 
-        if latitude >= 0:
-            days_since_solstice = day_of_year + northern_offset
-            if days_since_solstice >= days_in_year:
-                days_since_solstice = days_since_solstice - days_in_year
-        else:
-            days_since_solstice = day_of_year - southern_offset
-            if days_since_solstice < 0:
-                days_since_solstice = days_since_solstice + days_in_year
+def days_since_solstice(latitude, date):
+    year = date.year
+    day_of_year = date.timetuple().tm_yday
+    days_since_solstice = 0
+    northern_offset = 10
+    southern_offset = 173 if is_leap_year(year) else 172
+    days_in_year = 366 if is_leap_year(year) else 365
 
-        return days_since_solstice
+    if latitude >= 0:
+        days_since_solstice = day_of_year + northern_offset
+        if days_since_solstice >= days_in_year:
+            days_since_solstice = days_since_solstice - days_in_year
+    else:
+        days_since_solstice = day_of_year - southern_offset
+        if days_since_solstice < 0:
+            days_since_solstice = days_since_solstice + days_in_year
+
+    return days_since_solstice
 
 
 def normalize(angle, bound):
@@ -304,7 +304,7 @@ def date_with_hours(date, hours):
 def julian_day(date):
     Y = date.year if date.month > 2 else date.year - 1
     M = date.month if date.month > 2 else date.month + 12
-    D = date.day + date.hour / 24.0
+    D = date.day + date.hour / 24.0 + date.minute / 1440.0 + date.second / 86400.0
 
     A = int(Y / 100)
     B = 2 - A + int(A / 4)
@@ -347,7 +347,7 @@ def mean_lunar_longitude(julian_century):
     T = julian_century
 
     i = 218.3165
-    j = 481267.8813 + T
+    j = 481267.8813 * T
     Lp = i + j
     return unwind_angle_360(Lp)
 
@@ -496,14 +496,14 @@ def corrected_transit(approximate_transit, longitude, sidereal_time, right_ascen
 
     Lw = L * -1
     θ = unwind_angle_360(Θ0 + (360.985647 * m0))
-    α = interpolate(α2, α1, α3, m0)
-    H = (θ - Lw - α)
-    Δm = H / -360 if (H >= -180 and H <= 180) else 0
+    α = unwind_angle_360(interpolate_angles(α2, α1, α3, m0))
+    H = unwind_angle_180((θ - Lw - α))
+    Δm = H / -360
     return (m0 + Δm) * 24
 
 
 # Equation from page Astronomical Algorithms p102
-def correctedHourAngle(approximate_transit, angle, coordinates, after_transit, sidereal_time, right_ascension, previous_right_ascension, next_right_ascension, declination, previous_declination, next_declination):
+def corrected_hour_angle(approximate_transit, angle, coordinates, after_transit, sidereal_time, right_ascension, previous_right_ascension, next_right_ascension, declination, previous_declination, next_declination):
     m0 = approximate_transit
     h0 = angle
     Θ0 = sidereal_time
@@ -514,20 +514,23 @@ def correctedHourAngle(approximate_transit, angle, coordinates, after_transit, s
     δ2 = declination
     δ3 = next_declination
 
-    Lw = coordinates.longitude * -1
-    i = math.sin(math.radians(h0)) - (math.sin(math.radians(coordinates.latitude)) * math.sin(math.radians(δ2)))
-    j = math.cos(math.radians(coordinates.latitude)) * math.cos(math.radians(δ2))
-    H0 = math.radians(math.acos(i / j))
-    m = m0 + (H0 / 360) if after_transit else m0 - (H0 / 360)
-    θ = unwind_angle_360(Θ0 + (360.985647 * m))
-    α = interpolate(α2, α1, α3, m)
-    δ = interpolate(δ2, δ1, δ3, m)
-    H = (θ - Lw - α)
-    h = altitude_of_celestial_body(coordinates.latitude, δ, H)
-    k = h - h0
-    l = 360 * math.cos(math.radians(δ)) * math.cos(math.radians(coordinates.latitude)) * math.sin(math.radians(H))
-    Δm = k / l
-    return (m + Δm) * 24
+    try:
+        Lw = coordinates.longitude * -1
+        i = math.sin(math.radians(h0)) - (math.sin(math.radians(coordinates.latitude)) * math.sin(math.radians(δ2)))
+        j = math.cos(math.radians(coordinates.latitude)) * math.cos(math.radians(δ2))
+        H0 = math.degrees(math.acos(i / j))
+        m = m0 + (H0 / 360) if after_transit else m0 - (H0 / 360)
+        θ = unwind_angle_360(Θ0 + (360.985647 * m))
+        α = unwind_angle_360(interpolate_angles(α2, α1, α3, m))
+        δ = interpolate(δ2, δ1, δ3, m)
+        H = (θ - Lw - α)
+        h = altitude_of_celestial_body(coordinates.latitude, δ, H)
+        k = h - h0
+        l = 360 * math.cos(math.radians(δ)) * math.cos(math.radians(coordinates.latitude)) * math.sin(math.radians(H))
+        Δm = k / l
+        return (m + Δm) * 24
+    except ValueError:
+        return float('NaN')
 
 
 # Interpolation of a value given equidistant previous and next values and a factor equal to the fraction of the interpolated
@@ -541,6 +544,19 @@ def interpolate(value, previous_value, next_value, factor):
 
     a = y2 - y1
     b = y3 - y2
+    c = b - a
+    return y2 + ((n / 2) * (a + b + (n * c)))
+
+
+# Interpolation of three angles, accounting for angle unwinding.
+def interpolate_angles(value, previous_value, next_value, factor):
+    y1 = previous_value
+    y2 = value
+    y3 = next_value
+    n = factor
+
+    a = unwind_angle_360(y2 - y1)
+    b = unwind_angle_360(y3 - y2)
     c = b - a
     return y2 + ((n / 2) * (a + b + (n * c)))
 
@@ -574,7 +590,7 @@ class SolarTime:
         date = dt.datetime(date.year, date.month, date.day)
 
         next_date = date + dt.timedelta(1)
-        previous_date = date - dt.timedelta(-1)
+        previous_date = date - dt.timedelta(1)
 
         solar = SolarCoordinates(julian_day(date))
         next_solar = SolarCoordinates(julian_day(next_date))
@@ -590,11 +606,11 @@ class SolarTime:
         self.previous_solar = previous_solar
         self.approximate_transit = m0
         self.transit = corrected_transit(m0, coordinates.longitude, solar.apparent_sidereal_time, solar.right_ascension, previous_solar.right_ascension, next_solar.right_ascension)
-        self.sunrise = correctedHourAngle(m0, solar_altitude, coordinates, False, solar.apparent_sidereal_time, solar.right_ascension, previous_solar.right_ascension, next_solar.right_ascension, solar.declination, previous_solar.declination, next_solar.declination)
-        self.sunset = correctedHourAngle(m0, solar_altitude, coordinates, True, solar.apparent_sidereal_time, solar.right_ascension, previous_solar.right_ascension, next_solar.right_ascension, solar.declination, previous_solar.declination, next_solar.declination)
+        self.sunrise = corrected_hour_angle(m0, solar_altitude, coordinates, False, solar.apparent_sidereal_time, solar.right_ascension, previous_solar.right_ascension, next_solar.right_ascension, solar.declination, previous_solar.declination, next_solar.declination)
+        self.sunset = corrected_hour_angle(m0, solar_altitude, coordinates, True, solar.apparent_sidereal_time, solar.right_ascension, previous_solar.right_ascension, next_solar.right_ascension, solar.declination, previous_solar.declination, next_solar.declination)
 
     def hour_angle(self, angle, after_transit):
-        return correctedHourAngle(self.approximate_transit, angle, self.observer, after_transit, self.solar.apparent_sidereal_time, self.solar.right_ascension, self.previous_solar.right_ascension, self.next_solar.right_ascension, self.solar.declination, self.previous_solar.declination, self.next_solar.declination)
+        return corrected_hour_angle(self.approximate_transit, angle, self.observer, after_transit, self.solar.apparent_sidereal_time, self.solar.right_ascension, self.previous_solar.right_ascension, self.next_solar.right_ascension, self.solar.declination, self.previous_solar.declination, self.next_solar.declination)
 
     def afternoon(self, shadow_length):
         tangent = math.fabs(self.observer.latitude - self.solar.declination)
