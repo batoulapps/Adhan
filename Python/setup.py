@@ -9,11 +9,12 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7',
-        'Topic :: Text Processing :: Linguistic',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Religion',
+        'Topic :: Scientific/Engineering :: Astronomy'
     ],
-    keywords='funniest joke comedy flying circus',
-    url='http://github.com/batoulapps/adhan-python',
+    keywords='adhan prayer time fajr sunrise dhuhr asr maghrib sunset isha',
+    url='http://github.com/batoulapps/adhan',
     author='Matthew Crenshaw',
     author_email='matthew.crenshaw@batoulapps.com',
     license='MIT',

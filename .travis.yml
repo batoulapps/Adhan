@@ -8,3 +8,8 @@ before_script:
 script:
  - xctool -project Swift/Adhan.xcodeproj -scheme AdhanTests -sdk iphonesimulator build test
  - JavaScript/Tests/runtests
+ - node-qunit-phantomjs JavaScript/Tests/tests.html
+ - nosetests Python
+python: 3.5
+install:
+  - pip install Python
