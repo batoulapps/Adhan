@@ -13,7 +13,7 @@ setup(
         'Topic :: Religion',
         'Topic :: Scientific/Engineering :: Astronomy'
     ],
-    keywords='adhan prayer time fajr sunrise dhuhr asr maghrib sunset isha',
+    keywords='adhan prayer time fajr sunrise dhuhr asr maghrib sunset isha muslim islam',
     url='http://github.com/batoulapps/adhan',
     author='Matthew Crenshaw',
     author_email='matthew.crenshaw@batoulapps.com',
