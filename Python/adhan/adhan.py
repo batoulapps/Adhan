@@ -87,7 +87,7 @@ class CalculationMethod(Enum):
         if self == CalculationMethod.muslim_world_league:
             return CalculationParameters(fajr_angle=18, isha_angle=17, method=self)
         elif self == CalculationMethod.egyptian:
-            return CalculationParameters(fajr_angle=20, isha_angle=18, method=self)
+            return CalculationParameters(fajr_angle=19.5, isha_angle=17.5, method=self)
         elif self == CalculationMethod.karachi:
             return CalculationParameters(fajr_angle=18, isha_angle=18, method=self)
         elif self == CalculationMethod.umm_al_qura:
@@ -124,12 +124,10 @@ class PrayerTimes:
         isha = None
 
         if not all((sunrise, dhuhr, asr, maghrib)):
-            raise Exception('fail', 'whale')
             return None
 
         tomorrow_sunrise = sunrise + dt.timedelta(days=1)
         if tomorrow_sunrise is None:
-            raise Exception('fail', 'whale')
             return None
 
         night_duration = tomorrow_sunrise - maghrib
@@ -137,20 +135,18 @@ class PrayerTimes:
         fajr = self.__calculate_fajr(coordinates, date, calculation_parameters, solar_time, sunrise, night_duration)
         isha = self.__calculate_isha(coordinates, date, calculation_parameters, solar_time, maghrib, night_duration)
 
-        if fajr is None:
-            raise Exception('Unable to calculate fajr')
-        if isha is None:
-            raise Exception('Unable to calculate isha')
+        if fajr is None or isha is None:
+            return None
 
         # Moonsighting Committee requires 5 minutes for the sun
         # to pass the zenith and dhuhr to enter
         # Default behavior waits 1 minute for the sun to pass
         # the zenith and dhuhr to enter
-        dhuhr_offset = 300 if is_moonsighting else 60
+        dhuhr_offset = 5 if is_moonsighting else 1
 
         # Moonsighting Committee adds 3 minutes to sunset time
         # to account for light refraction
-        maghrib_offset = 180 if is_moonsighting else 0
+        maghrib_offset = 3 if is_moonsighting else 0
 
         self.fajr = rounded_minute(fajr + dt.timedelta(minutes=calculation_parameters.adjustments.fajr))
         self.sunrise = rounded_minute(sunrise + dt.timedelta(minutes=calculation_parameters.adjustments.sunrise))
@@ -167,7 +163,7 @@ class PrayerTimes:
         safe_fajr = None
         if calculation_parameters.method == CalculationMethod.moonsighting_committee:
             if coordinates.latitude < 55:
-                safe_fajr = cls.season_adjusted_fajr(coordinates.latitude, date, sunrise)
+                safe_fajr = season_adjusted_morning_twilight(coordinates.latitude, date, sunrise)
             else:
                 night_fration = night_duration / 7
                 safe_fajr = sunrise - night_fration
@@ -194,7 +190,7 @@ class PrayerTimes:
             safe_isha = None
             if calculation_parameters.method == CalculationMethod.moonsighting_committee:
                 if coordinates.latitude < 55:
-                    safe_isha = cls.season_adjusted_isha(coordinates.latitude, date, sunset)
+                    safe_isha = season_adjusted_evening_twilight(coordinates.latitude, date, sunset)
                 else:
                     night_fration = night_duration / 7
                     safe_isha = sunset + night_fration
@@ -208,51 +204,51 @@ class PrayerTimes:
 
         return isha
 
-    @classmethod
-    def season_adjusted_fajr(cls, latitude, date, sunrise):
-        a = 75 + 28.65 / 55.0 * math.fabs(latitude)
-        b = 75 + 19.44 / 55.0 * math.fabs(latitude)
-        c = 75 + 32.74 / 55.0 * math.fabs(latitude)
-        d = 75 + 48.10 / 55.0 * math.fabs(latitude)
 
-        dyy = days_since_solstice(latitude, date)
-        if dyy < 91:
-            adjustment = a + (b - a) / 91.0 * dyy
-        elif dyy < 137:
-            adjustment = b + (c - b) / 46.0 * (dyy - 91)
-        elif dyy < 183:
-            adjustment = c + (d - c) / 46.0 * (dyy - 137)
-        elif dyy < 229:
-            adjustment = d + (c - d) / 46.0 * (dyy - 183)
-        elif dyy < 275:
-            adjustment = c + (b - c) / 46.0 * (dyy - 229)
-        else:
-            adjustment = b + (a - b) / 91.0 * (dyy - 275)
+def season_adjusted_morning_twilight(latitude, date, sunrise):
+    a = 75 + 28.65 / 55.0 * math.fabs(latitude)
+    b = 75 + 19.44 / 55.0 * math.fabs(latitude)
+    c = 75 + 32.74 / 55.0 * math.fabs(latitude)
+    d = 75 + 48.10 / 55.0 * math.fabs(latitude)
 
-        return sunrise + dt.timedelta(math.floor(adjustment) * -60)
+    dyy = days_since_solstice(latitude, date)
+    if dyy < 91:
+        adjustment = a + (b - a) / 91.0 * dyy
+    elif dyy < 137:
+        adjustment = b + (c - b) / 46.0 * (dyy - 91)
+    elif dyy < 183:
+        adjustment = c + (d - c) / 46.0 * (dyy - 137)
+    elif dyy < 229:
+        adjustment = d + (c - d) / 46.0 * (dyy - 183)
+    elif dyy < 275:
+        adjustment = c + (b - c) / 46.0 * (dyy - 229)
+    else:
+        adjustment = b + (a - b) / 91.0 * (dyy - 275)
 
-    @classmethod
-    def season_adjusted_isha(cls, latitude, date, sunrise):
-        a = 75 + 28.65 / 55.0 * math.fabs(latitude)
-        b = 75 + 19.44 / 55.0 * math.fabs(latitude)
-        c = 75 + 32.74 / 55.0 * math.fabs(latitude)
-        d = 75 + 48.10 / 55.0 * math.fabs(latitude)
+    return sunrise - dt.timedelta(seconds=round(adjustment * 60))
 
-        dyy = days_since_solstice(latitude, date)
-        if dyy < 91:
-            adjustment = a + (b - a) / 91.0 * dyy
-        elif dyy < 137:
-            adjustment = b + (c - b) / 46.0 * (dyy - 91)
-        elif dyy < 183:
-            adjustment = c + (d - c) / 46.0 * (dyy - 137)
-        elif dyy < 229:
-            adjustment = d + (c - d) / 46.0 * (dyy - 183)
-        elif dyy < 275:
-            adjustment = c + (b - c) / 46.0 * (dyy - 229)
-        else:
-            adjustment = b + (a - b) / 91.0 * (dyy - 275)
 
-        return sunrise + dt.timedelta(math.ceil(adjustment) * 60)
+def season_adjusted_evening_twilight(latitude, date, sunset):
+    a = 75 + 25.60 / 55.0 * math.fabs(latitude)
+    b = 75 + 2.050 / 55.0 * math.fabs(latitude)
+    c = 75 - 9.210 / 55.0 * math.fabs(latitude)
+    d = 75 + 6.140 / 55.0 * math.fabs(latitude)
+
+    dyy = days_since_solstice(latitude, date)
+    if dyy < 91:
+        adjustment = a + (b - a) / 91.0 * dyy
+    elif dyy < 137:
+        adjustment = b + (c - b) / 46.0 * (dyy - 91)
+    elif dyy < 183:
+        adjustment = c + (d - c) / 46.0 * (dyy - 137)
+    elif dyy < 229:
+        adjustment = d + (c - d) / 46.0 * (dyy - 183)
+    elif dyy < 275:
+        adjustment = c + (b - c) / 46.0 * (dyy - 229)
+    else:
+        adjustment = b + (a - b) / 91.0 * (dyy - 275)
+
+    return sunset + dt.timedelta(seconds=round(adjustment * 60))
 
 
 def days_since_solstice(latitude, date):
@@ -275,9 +271,8 @@ def days_since_solstice(latitude, date):
     return days_since_solstice
 
 
-def normalize(angle, bound):
-    normalized = angle - (bound * (math.floor(angle / bound)))
-    return normalized if normalized >= 0 else normalized + bound
+def normalize(value, bound):
+    return value - (bound * math.floor(value / bound))
 
 
 def unwind_angle_360(angle):
