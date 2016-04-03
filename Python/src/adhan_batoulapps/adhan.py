@@ -194,6 +194,7 @@ class PrayerTimes:
 
     @classmethod
     def __calculate_isha(cls, coordinates, date, calculation_parameters, solar_time, sunset, night_duration):
+        isha = None
         # isha calcuation w/ check against safe value
         if calculation_parameters.isha_interval > 0:
             isha = sunset + dt.timedelta(minutes=calculation_parameters.isha_interval)
@@ -300,7 +301,7 @@ def unwind_angle_180(angle):
 
 
 def rounded_minute(date):
-    return dt.datetime(date.year, date.month, date.day, date.hour, int(date.minute + round(date.second / 60.0)))
+    return dt.datetime(date.year, date.month, date.day, date.hour) + dt.timedelta(minutes=int(date.minute + round(date.second / 60.0)))
 
 
 def date_with_hours(date, hours):
