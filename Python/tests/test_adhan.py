@@ -1,4 +1,5 @@
 import datetime as dt
+import pytest
 from adhan_batoulapps import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
 
 
@@ -70,7 +71,7 @@ def test_calculation_methods():
 
 
 def test_prayer_times():
-    date = dt.datetime(2015, 7, 12)
+    date = dt.date(2015, 7, 12)
     params = CalculationMethod.north_america.calculation_parameters()
     params.madhab = Madhab.hanafi
     coords = Coordinates(35.7750, -78.6336)
@@ -85,7 +86,7 @@ def test_prayer_times():
 
 
 def test_offsets():
-    date = dt.datetime(2015, 12, 1)
+    date = dt.date(2015, 12, 1)
     params = CalculationMethod.muslim_world_league.calculation_parameters()
     params.madhab = Madhab.shafi
     coords = Coordinates(35.7750, -78.6336)
@@ -125,7 +126,7 @@ def test_offsets():
 
 
 def test_moonsighting_method():
-    date = dt.datetime(2016, 1, 31)
+    date = dt.date(2016, 1, 31)
     params = CalculationMethod.moonsighting_committee.calculation_parameters()
     coords = Coordinates(35.7750, -78.6336)
 
@@ -136,3 +137,53 @@ def test_moonsighting_method():
     assert p.asr.strftime('%-I:%M %p') == '8:20 PM'
     assert p.maghrib.strftime('%-I:%M %p') == '10:43 PM'
     assert p.isha.strftime('%-I:%M %p') == '12:05 AM'
+
+
+def test_prayer_times_with_timezone():
+    class utcplusfive(dt.tzinfo):
+        def utcoffset(self, datetime):
+            return dt.timedelta(hours=5)
+
+        def tzname(self, datetime):
+            return "UTC+5"
+
+        def dst(self, datetime):
+            return dt.timedelta(0)
+
+    date = dt.datetime(2015, 7, 12, tzinfo=utcplusfive())
+    params = CalculationMethod.north_america.calculation_parameters()
+    params.madhab = Madhab.hanafi
+    coords = Coordinates(35.7750, -78.6336)
+
+    p = PrayerTimes(coordinates=coords, date=date, calculation_parameters=params)
+    assert p.fajr.strftime('%-I:%M %p') == '8:42 AM'
+    assert p.sunrise.strftime('%-I:%M %p') == '10:08 AM'
+    assert p.dhuhr.strftime('%-I:%M %p') == '5:21 PM'
+    assert p.asr.strftime('%-I:%M %p') == '10:22 PM'
+    assert p.maghrib.strftime('%-I:%M %p') == '12:32 AM'
+    assert p.isha.strftime('%-I:%M %p') == '1:57 AM'
+
+
+def test_prayer_times_input_time_stripping():
+    date = dt.datetime(2015, 7, 12, 12, 5, 40)
+    params = CalculationMethod.north_america.calculation_parameters()
+    params.madhab = Madhab.hanafi
+    coords = Coordinates(35.7750, -78.6336)
+
+    p = PrayerTimes(coordinates=coords, date=date, calculation_parameters=params)
+    assert p.fajr.strftime('%-I:%M %p') == '8:42 AM'
+    assert p.sunrise.strftime('%-I:%M %p') == '10:08 AM'
+    assert p.dhuhr.strftime('%-I:%M %p') == '5:21 PM'
+    assert p.asr.strftime('%-I:%M %p') == '10:22 PM'
+    assert p.maghrib.strftime('%-I:%M %p') == '12:32 AM'
+    assert p.isha.strftime('%-I:%M %p') == '1:57 AM'
+
+
+def test_prayer_times_date_value_error():
+    date = "2015-07-12"
+    params = CalculationMethod.north_america.calculation_parameters()
+    params.madhab = Madhab.hanafi
+    coords = Coordinates(35.7750, -78.6336)
+
+    with pytest.raises(ValueError):
+        PrayerTimes(coordinates=coords, date=date, calculation_parameters=params)
