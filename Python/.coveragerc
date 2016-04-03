@@ -1,0 +1,12 @@
+[run]
+branch = True
+source = adhan_batoulapps
+
+[paths]
+source =
+  src/adhan_batoulapps
+  .tox/*/lib/python*/site-packages/adhan_batoulapps
+  .tox/pypy/site-packages/adhan_batoulapps
+
+[report]
+show_missing = True

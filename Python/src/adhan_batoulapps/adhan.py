@@ -113,6 +113,12 @@ class PrayerTimes:
         self.maghrib = None
         self.isha = None
 
+        if not isinstance(date, dt.date):
+            raise ValueError('date must be a datetime.date object')
+
+        if isinstance(date, dt.datetime):
+            date = date.date()
+
         is_moonsighting = calculation_parameters.method == CalculationMethod.moonsighting_committee
 
         solar_time = SolarTime(date, coordinates)
@@ -148,12 +154,21 @@ class PrayerTimes:
         # to account for light refraction
         maghrib_offset = 3 if is_moonsighting else 0
 
-        self.fajr = rounded_minute(fajr + dt.timedelta(minutes=calculation_parameters.adjustments.fajr))
-        self.sunrise = rounded_minute(sunrise + dt.timedelta(minutes=calculation_parameters.adjustments.sunrise))
-        self.dhuhr = rounded_minute(dhuhr + dt.timedelta(minutes=calculation_parameters.adjustments.dhuhr + dhuhr_offset))
-        self.asr = rounded_minute(asr + dt.timedelta(minutes=calculation_parameters.adjustments.asr))
-        self.maghrib = rounded_minute(maghrib + dt.timedelta(minutes=calculation_parameters.adjustments.maghrib + maghrib_offset))
-        self.isha = rounded_minute(isha + dt.timedelta(minutes=calculation_parameters.adjustments.isha))
+        fajr = rounded_minute(fajr + dt.timedelta(minutes=calculation_parameters.adjustments.fajr))
+        sunrise = rounded_minute(sunrise + dt.timedelta(minutes=calculation_parameters.adjustments.sunrise))
+        dhuhr = rounded_minute(dhuhr + dt.timedelta(minutes=calculation_parameters.adjustments.dhuhr + dhuhr_offset))
+        asr = rounded_minute(asr + dt.timedelta(minutes=calculation_parameters.adjustments.asr))
+        maghrib = rounded_minute(maghrib + dt.timedelta(minutes=calculation_parameters.adjustments.maghrib + maghrib_offset))
+        isha = rounded_minute(isha + dt.timedelta(minutes=calculation_parameters.adjustments.isha))
+
+        utc = UTC()
+
+        self.fajr = fajr.replace(tzinfo=utc)
+        self.sunrise = sunrise.replace(tzinfo=utc)
+        self.dhuhr = dhuhr.replace(tzinfo=utc)
+        self.asr = asr.replace(tzinfo=utc)
+        self.maghrib = maghrib.replace(tzinfo=utc)
+        self.isha = isha.replace(tzinfo=utc)
 
     @classmethod
     def __calculate_fajr(cls, coordinates, date, calculation_parameters, solar_time, sunrise, night_duration):
@@ -612,3 +627,14 @@ class SolarTime:
         inverse = shadow_length + math.tan(math.radians(tangent))
         angle = math.degrees(math.atan(1.0 / inverse))
         return self.hour_angle(angle, True)
+
+
+class UTC(dt.tzinfo):
+    def utcoffset(self, datetime):
+        return dt.timedelta(0)
+
+    def tzname(self, datetime):
+        return "UTC"
+
+    def dst(self, datetime):
+        return dt.timedelta(0)

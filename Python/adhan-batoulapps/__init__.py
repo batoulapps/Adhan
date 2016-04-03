@@ -1,1 +1,0 @@
-from .adhan import *

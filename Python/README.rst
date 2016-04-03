@@ -1,7 +1,10 @@
 Adhan
---------
+-----
 
-To use, simply::
+To use, simply
+==============
+
+.. code:: python
 
     from datetime import datetime
     from adhan import CalculationMethod, Coordinates, Madhab, PrayerTimes
@@ -19,5 +22,6 @@ To use, simply::
     print('Maghrib ', prayer_times.maghrib.strftime("%-I:%M %p %z"))
     print('Isha    ', prayer_times.isha.strftime("%-I:%M %p %z"))
 
+
 Note:
-  Adhan expects `datetime` objects to be naive. All times are calculated assuming UTC.
+  Adhan returns all times UTC

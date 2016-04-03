@@ -1,5 +1,5 @@
 import datetime as dt
-from adhan import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
+from adhan_batoulapps import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
 
 
 def test_night_portion():
