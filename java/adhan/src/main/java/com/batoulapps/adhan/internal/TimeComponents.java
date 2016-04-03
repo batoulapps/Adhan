@@ -1,8 +1,9 @@
 package com.batoulapps.adhan.internal;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.LocalTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class TimeComponents {
   final int hours;
@@ -15,13 +16,13 @@ public class TimeComponents {
     this.seconds = seconds;
   }
 
-  public LocalDateTime dateComponents(LocalDate date) {
-    if (hours < 24) {
-      LocalTime time = LocalTime.of(hours, minutes, seconds);
-      return LocalDateTime.of(date, time);
-    } else {
-      return LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(),
-          23, minutes, seconds).plusHours(hours - 23);
-    }
+  public Date dateComponents(Date date) {
+    Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    calendar.setTime(date);
+    calendar.set(Calendar.HOUR_OF_DAY, 0);
+    calendar.set(Calendar.MINUTE, minutes);
+    calendar.set(Calendar.SECOND, seconds);
+    calendar.add(Calendar.HOUR_OF_DAY, hours);
+    return calendar.getTime();
   }
 }
