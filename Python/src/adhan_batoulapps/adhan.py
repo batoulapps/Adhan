@@ -39,9 +39,6 @@ class Coordinates:
         self.latitude = latitude
         self.longitude = longitude
 
-    def __repr__(self):
-        return '<%s, %s>' % (self.latitude, self.longitude)
-
 
 # Adjustment value for prayer times, in minutes
 class PrayerAdjustments:
@@ -140,8 +137,6 @@ class PrayerTimes:
             return None
 
         tomorrow_sunrise = sunrise + dt.timedelta(days=1)
-        if tomorrow_sunrise is None:
-            return None
 
         night_duration = tomorrow_sunrise - maghrib
 
@@ -176,9 +171,6 @@ class PrayerTimes:
         self.asr = asr.replace(tzinfo=utc)
         self.maghrib = maghrib.replace(tzinfo=utc)
         self.isha = isha.replace(tzinfo=utc)
-
-    def __repr__(self):
-        return '<%s, %s, %s>' % (self.coordinates, self.date, self.calculation_parameters)
 
     @classmethod
     def __calculate_fajr(cls, coordinates, date, calculation_parameters, solar_time, sunrise, night_duration):
