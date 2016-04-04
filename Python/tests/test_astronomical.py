@@ -73,6 +73,14 @@ def test_altitude_of_celestial_body():
     assert math.isclose(h, 15.1249, abs_tol=0.0001)
 
 
+def test_solar_time_transit():
+    date = dt.date(2016, 5, 1)
+    coordinates = Coordinates(51.507194, -0.116711)
+    solar_time = SolarTime(date, coordinates)
+
+    assert math.isclose(solar_time.transit, 11.9586053947969, abs_tol=0.00000000001)
+
+
 def test_transit_and_hour_angle():
     # values from Astronomical Algorithms page 103
 

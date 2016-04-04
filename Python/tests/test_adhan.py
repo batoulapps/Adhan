@@ -3,6 +3,11 @@ import pytest
 from adhan_batoulapps import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
 
 
+def test_shadow_length():
+    assert Madhab.shafi.shadow_length() == 1
+    assert Madhab.hanafi.shadow_length() == 2
+
+
 def test_night_portion():
     params = CalculationParameters(fajr_angle=18, isha_angle=18)
     params.high_latitude_rule = HighLatitudeRule.middle_of_the_night
@@ -40,7 +45,7 @@ def test_calculation_methods():
     assert params.method == CalculationMethod.karachi
 
     params = CalculationMethod.umm_al_qura.calculation_parameters()
-    assert params.fajr_angle == 18
+    assert params.fajr_angle == 18.5
     assert params.isha_angle == 0
     assert params.isha_interval == 90
     assert params.method == CalculationMethod.umm_al_qura
@@ -125,7 +130,7 @@ def test_offsets():
     assert p.isha.strftime('%-I:%M %p') == '11:26 PM'
 
 
-def test_moonsighting_method():
+def test_moonsighting_method_1():
     date = dt.date(2016, 1, 31)
     params = CalculationMethod.moonsighting_committee.calculation_parameters()
     coords = Coordinates(35.7750, -78.6336)
@@ -137,6 +142,22 @@ def test_moonsighting_method():
     assert p.asr.strftime('%-I:%M %p') == '8:20 PM'
     assert p.maghrib.strftime('%-I:%M %p') == '10:43 PM'
     assert p.isha.strftime('%-I:%M %p') == '12:05 AM'
+
+
+def test_moonsighting_method_2():
+    date = dt.date(2016, 1, 5)
+    params = CalculationMethod.umm_al_qura.calculation_parameters()
+    params.madhab = Madhab.shafi
+    params.high_latitude_rule = HighLatitudeRule.middle_of_the_night
+    coords = Coordinates(21.427009, 39.828685)
+
+    p = PrayerTimes(coordinates=coords, date=date, calculation_parameters=params)
+    assert p.fajr.strftime('%-I:%M %p') == '2:38 AM'
+    assert p.sunrise.strftime('%-I:%M %p') == '4:00 AM'
+    assert p.dhuhr.strftime('%-I:%M %p') == '9:27 AM'
+    assert p.asr.strftime('%-I:%M %p') == '12:31 PM'
+    assert p.maghrib.strftime('%-I:%M %p') == '2:52 PM'
+    assert p.isha.strftime('%-I:%M %p') == '4:22 PM'
 
 
 def test_prayer_times_with_timezone():

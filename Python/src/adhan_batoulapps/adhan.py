@@ -39,6 +39,9 @@ class Coordinates:
         self.latitude = latitude
         self.longitude = longitude
 
+    def __repr__(self):
+        return '<%s, %s>' % (self.latitude, self.longitude)
+
 
 # Adjustment value for prayer times, in minutes
 class PrayerAdjustments:
@@ -91,7 +94,7 @@ class CalculationMethod(Enum):
         elif self == CalculationMethod.karachi:
             return CalculationParameters(fajr_angle=18, isha_angle=18, method=self)
         elif self == CalculationMethod.umm_al_qura:
-            return CalculationParameters(fajr_angle=18, isha_interval=90, method=self)
+            return CalculationParameters(fajr_angle=18.5, isha_interval=90, method=self)
         elif self == CalculationMethod.gulf:
             return CalculationParameters(fajr_angle=19.5, isha_interval=90, method=self)
         elif self == CalculationMethod.moonsighting_committee:
@@ -112,12 +115,16 @@ class PrayerTimes:
         self.asr = None
         self.maghrib = None
         self.isha = None
+        self.coordinates = coordinates
+        self.calculation_parameters = calculation_parameters
 
         if not isinstance(date, dt.date):
             raise ValueError('date must be a datetime.date object')
 
         if isinstance(date, dt.datetime):
             date = date.date()
+
+        self.date = date
 
         is_moonsighting = calculation_parameters.method == CalculationMethod.moonsighting_committee
 
@@ -169,6 +176,9 @@ class PrayerTimes:
         self.asr = asr.replace(tzinfo=utc)
         self.maghrib = maghrib.replace(tzinfo=utc)
         self.isha = isha.replace(tzinfo=utc)
+
+    def __repr__(self):
+        return '<%s, %s, %s>' % (self.coordinates, self.date, self.calculation_parameters)
 
     @classmethod
     def __calculate_fajr(cls, coordinates, date, calculation_parameters, solar_time, sunrise, night_duration):
@@ -301,7 +311,8 @@ def unwind_angle_180(angle):
 
 
 def rounded_minute(date):
-    return dt.datetime(date.year, date.month, date.day, date.hour) + dt.timedelta(minutes=int(date.minute + round(date.second / 60.0)))
+    return dt.datetime(date.year, date.month, date.day, date.hour) \
+        + dt.timedelta(minutes=int(date.minute + round(date.second / 60.0 + date.microsecond / 60000000.0)))
 
 
 def date_with_hours(date, hours):
