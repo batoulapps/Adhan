@@ -199,16 +199,16 @@ class PrayerTimes:
 
     @classmethod
     def __calculate_fajr(cls, coordinates, date, calculation_parameters, solar_time, sunrise, night_duration):
-        fajr = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.fajr_angle, False))
+        if calculation_parameters.method == CalculationMethod.moonsighting_committee and coordinates.latitude >= 55:
+            night_fration = night_duration / 7
+            fajr = sunrise - night_fration
+        else:
+            fajr = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.fajr_angle, False))
 
         # fajr check against safe value
         safe_fajr = None
         if calculation_parameters.method == CalculationMethod.moonsighting_committee:
-            if coordinates.latitude < 55:
-                safe_fajr = season_adjusted_morning_twilight(coordinates.latitude, date, sunrise)
-            else:
-                night_fration = night_duration / 7
-                safe_fajr = sunrise - night_fration
+            safe_fajr = season_adjusted_morning_twilight(coordinates.latitude, date, sunrise)
         else:
             fajr_portion, isha_portion = calculation_parameters.night_portions()
             night_fration = night_duration * fajr_portion
@@ -226,17 +226,15 @@ class PrayerTimes:
         if calculation_parameters.isha_interval > 0:
             isha = sunset + dt.timedelta(minutes=calculation_parameters.isha_interval)
         else:
-            temp_isha = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.isha_angle, True))
-            if temp_isha is not None:
-                isha = temp_isha
+            if calculation_parameters.method == CalculationMethod.moonsighting_committee and coordinates.latitude >= 55:
+                night_fration = night_duration / 7
+                isha = sunset + night_fration
+            else:
+                isha = date_with_hours(date, solar_time.hour_angle(-calculation_parameters.isha_angle, True))
 
             safe_isha = None
             if calculation_parameters.method == CalculationMethod.moonsighting_committee:
-                if coordinates.latitude < 55:
-                    safe_isha = season_adjusted_evening_twilight(coordinates.latitude, date, sunset)
-                else:
-                    night_fration = night_duration / 7
-                    safe_isha = sunset + night_fration
+                safe_isha = season_adjusted_evening_twilight(coordinates.latitude, date, sunset)
             else:
                 fajr_portion, isha_portion = calculation_parameters.night_portions()
                 night_fration = night_duration * isha_portion
