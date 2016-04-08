@@ -22,7 +22,7 @@ public enum CalculationMethod {
         return new CalculationParameters(18.0, 18.0, this);
       }
       case UMM_AL_QURA: {
-        return new CalculationParameters(18.0, 90, this);
+        return new CalculationParameters(18.5, 90, this);
       }
       case GULF: {
         return new CalculationParameters(19.5, 90, this);

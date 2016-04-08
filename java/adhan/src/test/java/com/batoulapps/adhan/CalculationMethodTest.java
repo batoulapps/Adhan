@@ -27,7 +27,7 @@ public class CalculationMethodTest {
     assertThat(params.method).isEqualTo(CalculationMethod.KARACHI);
 
     params = CalculationMethod.UMM_AL_QURA.getParameters();
-    assertThat(params.fajrAngle).isWithin(0.001).of(18);
+    assertThat(params.fajrAngle).isWithin(0.001).of(18.5);
     assertThat(params.ishaAngle).isWithin(0.001).of(0);
     assertThat(params.ishaInterval).isEqualTo(90);
     assertThat(params.method).isEqualTo(CalculationMethod.UMM_AL_QURA);

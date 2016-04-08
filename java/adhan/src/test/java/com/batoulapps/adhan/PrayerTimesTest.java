@@ -155,4 +155,25 @@ public class PrayerTimesTest {
     assertThat(formatter.format(prayerTimes.maghrib)).isEqualTo("05:43 PM");
     assertThat(formatter.format(prayerTimes.isha)).isEqualTo("07:05 PM");
   }
+
+  @Test
+  public void testMoonsightingMethodHighLat() {
+    // Values from http://www.moonsighting.com/pray.php
+    DateComponents date = new DateComponents(2016, 1, 1);
+    CalculationParameters parameters = CalculationMethod.MOON_SIGHTING_COMMITTEE.getParameters();
+    parameters.madhab = Madhab.HANAFI;
+    Coordinates coordinates = new Coordinates(59.9094, 10.7349);
+
+    PrayerTimes prayerTimes = new PrayerTimes(coordinates, date, parameters);
+
+    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+    formatter.setTimeZone(TimeZone.getTimeZone("Europe/Oslo"));
+
+    assertThat(formatter.format(prayerTimes.fajr)).isEqualTo("07:34 AM");
+    assertThat(formatter.format(prayerTimes.sunrise)).isEqualTo("09:19 AM");
+    assertThat(formatter.format(prayerTimes.dhuhr)).isEqualTo("12:25 PM");
+    assertThat(formatter.format(prayerTimes.asr)).isEqualTo("01:36 PM");
+    assertThat(formatter.format(prayerTimes.maghrib)).isEqualTo("03:25 PM");
+    assertThat(formatter.format(prayerTimes.isha)).isEqualTo("05:02 PM");
+  }
 }

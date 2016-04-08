@@ -60,24 +60,24 @@ public class PrayerTimes {
         tempAsr = timeComponents.dateComponents(date);
       }
 
+      // get night length
+      Date tomorrowSunrise = CalendricalHelper.add(sunriseComponents, 1, Calendar.DAY_OF_YEAR);
+      long night = tomorrowSunrise.getTime() - sunsetComponents.getTime();
+
       timeComponents = DoubleUtil.timeComponents(solarTime.hourAngle(-parameters.fajrAngle, false));
       if (timeComponents != null) {
         tempFajr = timeComponents.dateComponents(date);
       }
 
-      // get night length
-      Date tomorrowSunrise = CalendricalHelper.add(sunriseComponents, 1, Calendar.DAY_OF_YEAR);
-      long night = tomorrowSunrise.getTime() - sunsetComponents.getTime();
+      if (parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE &&
+          coordinates.latitude >= 55) {
+        tempFajr = CalendricalHelper.add(
+            sunriseComponents, -1 * (int) (night / 7000), Calendar.SECOND);
+      }
 
       final Date safeFajr;
       if (parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE) {
-        if (coordinates.latitude < 55) {
-          safeFajr = seasonAdjustedFajr(
-              coordinates.latitude, dayOfYear, year, sunriseComponents);
-        } else {
-          safeFajr = CalendricalHelper.add(
-              sunriseComponents, -1 * (int) (night / 7000), Calendar.SECOND);
-        }
+        safeFajr = seasonAdjustedFajr(coordinates.latitude, dayOfYear, year, sunriseComponents);
       } else {
         double portion = parameters.nightPortions().first;
         long nightFraction = (long) (portion * night / 1000);
@@ -100,15 +100,16 @@ public class PrayerTimes {
           tempIsha = timeComponents.dateComponents(date);
         }
 
+        if (parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE &&
+            coordinates.latitude >= 55) {
+          long nightFraction = night / 7000;
+          tempIsha = CalendricalHelper.add(sunsetComponents, (int) nightFraction, Calendar.SECOND);
+        }
+
         final Date safeIsha;
         if (parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE) {
-          if (coordinates.latitude < 55) {
             safeIsha = PrayerTimes.seasonAdjustedIsha(
                 coordinates.latitude, dayOfYear, year, sunsetComponents);
-          } else {
-            safeIsha = CalendricalHelper.add(sunsetComponents,
-                (int) (night / 7000), Calendar.SECOND);
-          }
         } else {
           double portion = parameters.nightPortions().second;
           long nightFraction = (long) (portion * night / 1000);
@@ -186,7 +187,7 @@ public class PrayerTimes {
       adjustment = b + ( a - b ) / 91.0 * ( dyy - 275 );
     }
 
-    return CalendricalHelper.add(sunrise, -(int) Math.floor(adjustment), Calendar.MINUTE);
+    return CalendricalHelper.add(sunrise, -(int) Math.round(adjustment), Calendar.MINUTE);
   }
 
   private static Date seasonAdjustedIsha(double latitude, int day, int year, Date sunset) {
