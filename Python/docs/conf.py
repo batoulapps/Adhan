@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# PyAdhan Documentation build configuration file, created by
-# sphinx-quickstart on Sun May 11 16:17:15 2014.
+# pyadhan documentation build configuration file, created by
+# sphinx-quickstart on Sun Apr 17 22:00:01 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -11,6 +12,9 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+#
+# read/find_version gracefully lifted from the attrs package. Thanks!
+#
 
 import codecs
 import datetime
@@ -92,7 +96,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PyAdhan'
+project = u'pyadhan'
+description = find_description("../pyadhan/__init__.py")
 year = datetime.date.today().year
 copyright = u'2016{0}, Batoul Apps'.format(
     u'-{0}'.format(year) if year != 2016 else u""
@@ -253,7 +258,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'pyadhan.tex', u'PyAdhan Documentation',
+    ('index', 'pyadhan.tex', u'pyadhan Documentation',
      u'Matthew Crenshaw', 'manual'),
 ]
 
@@ -283,7 +288,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyadhan', u'PyAdhan Documentation',
+    ('index', 'pyadhan', u'pyadhan Documentation',
      [u'Matthew Crenshaw'], 1)
 ]
 
@@ -297,8 +302,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'pyadhan', u'PyAdhan Documentation',
-     u'Matthew Crenshaw', 'pyadhan', find_description("../pyadhan/__init__.py"),
+    ('index', 'pyadhan', u'pyadhan Documentation',
+     u'Matthew Crenshaw', 'pyadhan', description,
      'Miscellaneous'),
 ]
 
@@ -317,3 +322,11 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/3': None}
+
+
+# Provide variables to rst files
+rst_epilog = """
+.. |project| replace:: {project}
+.. |description| replace:: {description}
+""".format(project=project,
+           description=description)

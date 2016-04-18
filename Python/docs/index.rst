@@ -3,20 +3,41 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PyAdhan's documentation!
+|project|: |description|
 ===================================
 
-Contents:
+Release v\ |release| (:doc:`What's new? <changelog>`).
 
-.. toctree::
-   :maxdepth: 2
+.. include:: ../README.rst
+   :start-after: teaser-begin
+
+   User's Guide
+   ------------
+
+   .. toctree::
+      :maxdepth: 1
+
+      why
+      examples
+      api
+      extending
+
+
+   Project Information
+   -------------------
+
+   .. toctree::
+      :maxdepth: 1
+
+      backward-compatibility
+      license
+      contributing
+      changelog
 
 
 
-Indices and tables
-==================
+   Indices and tables
+   ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   * :ref:`genindex`
+   * :ref:`search`
