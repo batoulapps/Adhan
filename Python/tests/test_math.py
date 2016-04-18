@@ -1,6 +1,6 @@
 import datetime as dt
 import math
-from adhan_batoulapps.adhan import normalize, unwind_angle_360, unwind_angle_180, rounded_minute
+from pyadhan.adhan import normalize, unwind_angle_360, unwind_angle_180, rounded_minute
 
 
 def test_normalize():

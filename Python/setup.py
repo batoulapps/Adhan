@@ -6,9 +6,9 @@ from setuptools import setup, find_packages
 
 ###################################################################
 
-NAME = "adhan_batoulapps"
-PACKAGES = find_packages(where="src")
-META_PATH = os.path.join("src", "adhan_batoulapps", "__init__.py")
+NAME = "pyadhan"
+PACKAGES = find_packages()
+META_PATH = os.path.join("pyadhan", "__init__.py")
 KEYWORDS = ["adhan", "prayer", "time", "fajr", "sunrise", "dhuhr", "asr", "maghrib", "sunset", "isha", "muslim", "islam", "salah"]
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",
@@ -66,7 +66,6 @@ if __name__ == "__main__":
         keywords=KEYWORDS,
         long_description=read("README.rst"),
         packages=PACKAGES,
-        package_dir={"": "src"},
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES

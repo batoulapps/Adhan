@@ -1,6 +1,6 @@
 import datetime as dt
 import math
-from adhan_batoulapps.adhan import SolarCoordinates, julian_day, julian_century, mean_solar_longitude, mean_obliquity_of_the_ecliptic, \
+from pyadhan.adhan import SolarCoordinates, julian_day, julian_century, mean_solar_longitude, mean_obliquity_of_the_ecliptic, \
     apparent_obliquity_of_the_ecliptic, mean_solar_anomaly, solar_equation_of_the_center, apparent_solar_longitude, \
     mean_sidereal_time, ascending_lunar_node_longitude, mean_lunar_longitude, nutation_in_longitude, nutation_in_obliquity, \
     altitude_of_celestial_body, approximate_transit, corrected_transit, corrected_hour_angle, Coordinates, SolarTime, \

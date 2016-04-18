@@ -4,7 +4,7 @@ import json
 import pytz
 import datetime as dt
 import pytest
-from adhan_batoulapps.adhan import CalculationMethod, Madhab, HighLatitudeRule, Coordinates, PrayerTimes
+from pyadhan.adhan import CalculationMethod, Madhab, HighLatitudeRule, Coordinates, PrayerTimes
 
 
 def parse_params(data):

@@ -1,6 +1,6 @@
 import datetime as dt
 import pytest
-from adhan_batoulapps.adhan import Coordinates, UTC
+from pyadhan.adhan import Coordinates, UTC
 
 
 def test_coordinates():

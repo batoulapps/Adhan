@@ -11,7 +11,7 @@ from .adhan import (
 
 __version__ = "0.1.0"
 
-__title__ = "adhan-batoulapps"
+__title__ = "pyadhan"
 __description__ = "Islamic prayer times calculations"
 __uri__ = "http://github.com/batoulapps/adhan"
 

@@ -1,12 +1,12 @@
 [run]
 branch = True
-source = adhan_batoulapps
+source = pyadhan
 
 [paths]
 source =
-  src/adhan_batoulapps
-  .tox/*/lib/python*/site-packages/adhan_batoulapps
-  .tox/pypy/site-packages/adhan_batoulapps
+  pyadhan
+  .tox/*/lib/python*/site-packages/pyadhan
+  .tox/pypy/site-packages/pyadhan
 
 [report]
 show_missing = True

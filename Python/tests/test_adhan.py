@@ -1,6 +1,6 @@
 import datetime as dt
 import pytest
-from adhan_batoulapps import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
+from pyadhan.adhan import CalculationParameters, HighLatitudeRule, CalculationMethod, PrayerTimes, Madhab, Coordinates, PrayerAdjustments
 
 
 def test_shadow_length():
