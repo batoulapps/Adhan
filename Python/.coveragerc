@@ -1,0 +1,12 @@
+[run]
+branch = True
+source = pyadhan
+
+[paths]
+source =
+  pyadhan
+  .tox/*/lib/python*/site-packages/pyadhan
+  .tox/pypy/site-packages/pyadhan
+
+[report]
+show_missing = True
