@@ -1,3 +1,6 @@
 include *.rst *.txt LICENSE tox.ini requirements.txt Makefile docs/Makefile .coveragerc
 recursive-include tests *.py
 recursive-include tests *.json
+recursive-include docs *.rst
+recursive-include docs *.py
+prune docs/_build
