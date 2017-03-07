@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.9'
   s.watchos.deployment_target = '2.0'
 
-  s.source_files =  'Swift/Adhan/Adhan.swift',
-                    'Swift/Adhan/AdhanObjc.swift'
-  
+  s.source_files =  'AdhanSwift/Adhan/Adhan.swift',
+                    'AdhanSwift/Adhan/AdhanObjc.swift'
+
 end
