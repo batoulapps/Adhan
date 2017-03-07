@@ -1,3 +1,7 @@
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![CocoaPods compatible](https://img.shields.io/cocoapods/v/Moya.svg)](https://cocoapods.org/pods/Adhan)
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
+
 # Adhan Swift
 
 The Adhan Swift implementation uses Swift 3 and has an Objective-C compatible wrapper.
@@ -20,7 +24,20 @@ Adhan supports [Carthage](https://github.com/Carthage/Carthage). Simply add the 
 github "batoulapps/Adhan" "master"
 ```
 
+### Swift Package Manager
 
+Adhan supports Apple's [Swift Package Manager](https://github.com/apple/swift-package-manager). Simply add the following line to your `Package.swift` manifest file:
+
+```swift
+import PackageDescription
+
+let package = Package(
+  name: "YourApp",
+  dependencies: [
+    .Package(url: "https://github.com/batoulapps/Adhan", majorVersion: 0, minor: 1)
+  ]
+)
+```
 
 ### Manual
 
@@ -145,7 +162,7 @@ if let prayers = PrayerTimes(coordinates: coordinates, date: date, calculationPa
     let formatter = DateFormatter()
     formatter.timeStyle = .medium
     formatter.timeZone = TimeZone(identifier: "America/New_York")!
-    
+
     NSLog("fajr %@", formatter.string(from: prayers.fajr))
     NSLog("sunrise %@", formatter.string(from: prayers.sunrise))
     NSLog("dhuhr %@", formatter.string(from: prayers.dhuhr))
