@@ -3,17 +3,17 @@
 
 [![Build Status](https://travis-ci.org/batoulapps/Adhan.svg?branch=master)](https://travis-ci.org/batoulapps/Adhan)
 
-Adhan is a well tested and well documented library for calculating Islamic prayer times. All astronomical calculations 
-are high precision equations directly from the book 
-[“Astronomical Algorithms” by Jean Meeus](http://www.willbell.com/math/mc1.htm). This book is recommended 
-by the Astronomical Applications Department of the U.S. Naval Observatory and the Earth System Research Laboratory 
+Adhan is a well tested and well documented library for calculating Islamic prayer times. All astronomical calculations
+are high precision equations directly from the book
+[“Astronomical Algorithms” by Jean Meeus](http://www.willbell.com/math/mc1.htm). This book is recommended
+by the Astronomical Applications Department of the U.S. Naval Observatory and the Earth System Research Laboratory
 of the National Oceanic and Atmospheric Administration.
 
 ## Languages
 
 Adhan is available for the following languages:
 
-- Swift & Objective-C [(Usage and examples)](Swift/)
+- Swift & Objective-C [(Usage and examples)](AdhanSwift/)
 - JavaScript [(Usage and examples)](JavaScript/)
 - Java [(Usage and examples)](java/)
 
@@ -29,9 +29,9 @@ This is an initial release of the library. The following items are planned:
 
 ## Contributing
 
-Adhan is made publicly available to provide a well tested and well documented library for Islamic prayer times to all 
-developers. We accept feature contributions provided that they are properly documented and include the appropriate 
-unit tests. We are also looking for contributions in the form of unit tests of of prayer times for different 
+Adhan is made publicly available to provide a well tested and well documented library for Islamic prayer times to all
+developers. We accept feature contributions provided that they are properly documented and include the appropriate
+unit tests. We are also looking for contributions in the form of unit tests of of prayer times for different
 locations, we do ask that the source of the comparison values be properly documented.
 
 ## License
