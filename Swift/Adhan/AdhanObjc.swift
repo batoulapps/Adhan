@@ -151,40 +151,60 @@ import Foundation
     
     private static func calculationMethodForBACalculationMethod(_ baMethod: BACalculationMethod) -> CalculationMethod {
         switch baMethod {
-        case .muslimWorldLeague:
-            return CalculationMethod.muslimWorldLeague
-        case .egyptian:
-            return CalculationMethod.egyptian
-        case .karachi:
-            return CalculationMethod.karachi
-        case .ummAlQura:
-            return CalculationMethod.ummAlQura
-        case .gulf:
-            return CalculationMethod.gulf
-        case .moonsightingCommittee:
-            return CalculationMethod.moonsightingCommittee
-        case .northAmerica:
-            return CalculationMethod.northAmerica
-        case .kuwait:
-            return CalculationMethod.kuwait
-        case .qatar:
-            return CalculationMethod.qatar
-        case .other:
-            return CalculationMethod.other
+        case .algerian: return CalculationMethod.algerian
+        case .diyanet: return CalculationMethod.diyanet
+        case .egyptianGeneralAuthority: return CalculationMethod.egyptianGeneralAuthority
+        case .egyptianGeneralNewAuthority: return CalculationMethod.egyptianGeneralNewAuthority
+        case .france15: return CalculationMethod.france15
+        case .france18: return CalculationMethod.france18
+        case .franceUOIF: return CalculationMethod.franceUOIF
+        case .gulf: return CalculationMethod.gulf
+        case .JAKIM: return CalculationMethod.JAKIM
+        case .jordan: return CalculationMethod.jordan
+        case .karachi: return CalculationMethod.karachi
+        case .kementerian: return CalculationMethod.kementerian
+        case .kuwait: return CalculationMethod.kuwait
+        case .moonsightingCommittee: return CalculationMethod.moonsightingCommittee
+        case .MUIS: return CalculationMethod.MUIS
+        case .muslimWorldLeague: return CalculationMethod.muslimWorldLeague
+        case .northAmerica: return CalculationMethod.northAmerica
+        case .oman: return CalculationMethod.oman
+        case .qatar: return CalculationMethod.qatar
+        case .russia: return CalculationMethod.russia
+        case .tunisian: return CalculationMethod.tunisian
+        case .UAE: return CalculationMethod.UAE
+        case .ummAlQura: return CalculationMethod.ummAlQura
+        case .ummAlQuraRamadan: return CalculationMethod.ummAlQuraRamadan
+        case .other: return CalculationMethod.other
         }
     }
 }
 
 @objc public enum BACalculationMethod: Int {
-    case muslimWorldLeague
-    case egyptian
-    case karachi
-    case ummAlQura
+    case algerian
+    case diyanet
+    case egyptianGeneralAuthority
+    case egyptianGeneralNewAuthority
+    case france15
+    case france18
+    case franceUOIF
     case gulf
-    case moonsightingCommittee
-    case northAmerica
+    case JAKIM
+    case jordan
+    case karachi
+    case kementerian
     case kuwait
+    case moonsightingCommittee
+    case MUIS
+    case muslimWorldLeague
+    case northAmerica
+    case oman
     case qatar
+    case russia
+    case tunisian
+    case UAE
+    case ummAlQura
+    case ummAlQuraRamadan
     case other
 }
 

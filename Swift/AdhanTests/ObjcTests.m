@@ -104,7 +104,7 @@
     if ([method isEqualToString:@"MuslimWorldLeague"]) {
         params = [[BACalculationParameters alloc] initWithMethod:BACalculationMethodMuslimWorldLeague];
     } else if ([method isEqualToString:@"Egyptian"]) {
-        params = [[BACalculationParameters alloc] initWithMethod:BACalculationMethodEgyptian];
+        params = [[BACalculationParameters alloc] initWithMethod:BACalculationMethodEgyptianGeneralAuthority];
     } else if ([method isEqualToString:@"Karachi"]) {
         params = [[BACalculationParameters alloc] initWithMethod:BACalculationMethodKarachi];
     } else if ([method isEqualToString:@"UmmAlQura"]) {

@@ -19,7 +19,7 @@ class TimeTests: XCTestCase {
         if method == "MuslimWorldLeague" {
             params = CalculationMethod.muslimWorldLeague.params
         } else if method == "Egyptian" {
-            params = CalculationMethod.egyptian.params
+            params = CalculationMethod.egyptianGeneralAuthority.params
         } else if method == "Karachi" {
             params = CalculationMethod.karachi.params
         } else if method == "UmmAlQura" {
