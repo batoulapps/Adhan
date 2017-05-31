@@ -219,7 +219,7 @@ public enum CalculationMethod: Int {
     case other
     
     
-    /// Description of CalculationMethod (location, angles)
+    /// Title of CalculationMethod
     public var title: String {
         switch self {
         case .algerian: return "Algerian Minister of Religioous Affairs and Awqaf"
@@ -247,15 +247,6 @@ public enum CalculationMethod: Int {
         case .moonsightingCommittee: return "Moonsighting Committee Worldwide"
         case .gulf: return "Gulf"
         case .other: return "Other"
-        }
-    }
-    
-    public var description: String {
-        switch self {
-        case .diyanet: return "Turkey"
-        case .ummAlQura, .ummAlQuraRamadan: return "Makkah, Saudi Arabia, Madinah, Riyad, Syria"
-        case .russia: return "Russia, Россия"
-        default: return ""
         }
     }
     
