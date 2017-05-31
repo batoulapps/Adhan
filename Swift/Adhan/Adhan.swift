@@ -113,63 +113,225 @@ public struct CalculationParameters {
 }
 
 /* Preset calculation parameters */
-public enum CalculationMethod {
+public enum CalculationMethod: Int {
+  
+    /// Returns array of all the calculation methods available
+    public static var all: [CalculationMethod] {
+      return [CalculationMethod.algerian, .diyanet, .egyptianGeneralAuthority, .egyptianGeneralNewAuthority, .france15, .france18, .franceUOIF, .JAKIM, .jordan, .karachi, .kementerian, .kuwait, .MUIS, .moonsightingCommittee, .muslimWorldLeague, .northAmerica, .oman, .qatar, .russia, .tunisian, .UAE, .ummAlQura, .ummAlQuraRamadan].sorted {
+        $0.0.title < $0.1.title
+      }
+    }
     
-    // Muslim World League
-    case muslimWorldLeague
+    /// Algerian Ministry of Religious Affairs
+    /// Fajr: 18,0 / Isha: 17,0
+    case algerian
     
-    //Egyptian General Authority of Survey
-    case egyptian
+    /// Diyanet İşleri Başkanlığı, Türkiye
+    /// Fajr: 18,0 / Isha: 17,0
+    case diyanet
     
-    // University of Islamic Sciences, Karachi
-    case karachi
+    /// Egyptian General Authority of Survey
+    /// Fajr: 19,5 / Isha: 17,5
+    case egyptianGeneralAuthority
     
-    // Umm al-Qura University, Makkah
-    case ummAlQura
+    /// Egyptian General Authority of Survey
+    /// Fajr: 20,0 / Isha: 18,0
+    case egyptianGeneralNewAuthority
     
-    // The Gulf Region
+    /// France - Angle 15
+    /// Fajr: 15,0 / Isha: 15,0
+    case france15
+    
+    /// France - Angle 18
+    /// Fajr: 18,0 / Isha: 18,0
+    case france18
+    
+    /// Union des Organisations Islamiques de France
+    /// Fajr: 12,0 / Isha: 12,0
+    case franceUOIF
+    
+    /// The Gulf Region
     case gulf
     
-    // Moonsighting Committee
-    case moonsightingCommittee
+    /// Jabatan Kemajuan Islam Malaysia - JAKIM
+    /// Fajr: 20,0 / Isha: 18,0
+    case JAKIM
     
-    // ISNA
-    case northAmerica
+    /// Jordan, Ministry of Awqaf and Islamic Affairs
+    /// Fajr: 18,0 / Isha: 18,0
+    case jordan
     
-    // Kuwait
+    /// University of Islamic Sciences, Karachi
+    /// Fajr: 18,0 / Isha: 18,0
+    case karachi
+    
+    /// Kementerian Agama Republik Indonesia
+    /// Fajr: 20,0 / Isha: 18,0
+    case kementerian
+    
+    /// Kuwait, Ministry of Awqaf and Islamic Affairs
+    /// Fajr: 18,0 / Isha: 17,5
     case kuwait
     
-    // Qatar
+    /// Moonsighting Committee
+    case moonsightingCommittee
+    
+    /// Majlis Ugama Islam Singapura - MUIS
+    /// Fajr: 20,0 / Isha: 18,0
+    case MUIS
+    
+    /// Muslim World League
+    /// Fajr: 18,0 / Isha: 17,0
+    case muslimWorldLeague
+    
+    /// ISNA
+    /// Fajr: 15,0 / Isha angle: 15,0
+    case northAmerica
+    
+    /// Oman, Ministry of Awqaf and Islamic Affairs
+    /// Fajr: 18,0 / Isha: 90 min. after Maghrib
+    case oman
+    
+    /// Qatar, Ministry of Awqaf and Islamic Affairs
+    /// Fajr: 18,0 / Isha: 90 min. after Maghrib
     case qatar
     
-    // Other
+    /// Russia
+    /// Fajr: 16,0 / Isha: 15,0
+    case russia
+    
+    /// Tunisian Ministry of Religious Affairs
+    /// Fajr: 18,0 / Isha: 18,0
+    case tunisian
+    
+    /// UAE General Authority of Islamic Affairs and Endowments
+    /// Fajr: 19,5 / Isha: 90 min. after Maghrib
+    case UAE
+    
+    /// Umm al-Qura University, Makkah
+    /// Fajr: 18,0 / Isha: 90 min. after Maghrib
+    case ummAlQura
+    
+    /// Umm al-Qura University, Makkah
+    /// Fajr: 18,0 / Isha: 120 min. after Maghrib
+    case ummAlQuraRamadan
+    
     case other
     
+    
+    /// Title of CalculationMethod
+    public var title: String {
+        switch self {
+        case .algerian: return "Algerian Minister of Religioous Affairs and Awqaf"
+        case .diyanet: return "Diyanet İşleri Başkanlığı, Türkiye"
+        case .egyptianGeneralAuthority: return "Egyptian General Authority of Survey"
+        case .egyptianGeneralNewAuthority: return "Egyptian General New Authority of Survey"
+        case .france15: return "France - Angle 15"
+        case .france18: return "France - Angle 18"
+        case .franceUOIF: return "France UOIF - Angle 12"
+        case .JAKIM: return "Jabatan Kemajuan Islam Malaysia - JAKIM"
+        case .jordan: return "Jordan, Ministry of Awqaf and Islamic Affairs"
+        case .kementerian: return "Kementerian Agama Republik Indonesia"
+        case .kuwait: return "Kuwait, Ministry of Awqaf and Islamic Affairs"
+        case .MUIS: return "Majlis Ugama Islam Singapura - MUIS"
+        case .muslimWorldLeague: return "Muslim World League - MWL"
+        case .northAmerica: return "North America - ISNA"
+        case .oman: return "Oman, Ministry of Awqaf and Islamic Affairs"
+        case .qatar: return "Qatar, Ministry of Awqaf and Islamic Affairs"
+        case .russia: return "Russia"
+        case .tunisian: return "Tunisian Ministry of Religious Affairs"
+        case .UAE: return "UAE General Authority of Islamic Affairs and Endowments"
+        case .ummAlQura: return "Umm al-Qura University"
+        case .ummAlQuraRamadan: return "Umm Al-Qura University (Ramadan)"
+        case .karachi: return "University of Islamic Sciences, Karachi"
+        case .moonsightingCommittee: return "Moonsighting Committee Worldwide"
+        case .gulf: return "Gulf"
+        case .other: return "Other"
+        }
+    }
+    
     public var params: CalculationParameters {
-        switch(self) {
-        case .muslimWorldLeague:
-            return CalculationParameters(fajrAngle: 18, ishaAngle: 17, method: self)
-        case .egyptian:
-            return CalculationParameters(fajrAngle: 19.5, ishaAngle: 17.5, method: self)
-        case .karachi:
-            return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
-        case .ummAlQura:
-            return CalculationParameters(fajrAngle: 18.5, ishaInterval: 90, method: self)
+        switch self {
+          
+        case .algerian:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 17, method: self)
+          
+        case .diyanet:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 17, method: self)
+          
+        case .egyptianGeneralAuthority:
+          return CalculationParameters(fajrAngle: 19.5, ishaAngle: 17.5, method: self)
+          
+        case .egyptianGeneralNewAuthority:
+          return CalculationParameters(fajrAngle: 20, ishaAngle: 18, method: self)
+          
+        case .france15:
+          return CalculationParameters(fajrAngle: 15, ishaAngle: 15, method: self)
+          
+        case .france18:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
+          
+        case .franceUOIF:
+          return CalculationParameters(fajrAngle: 12, ishaAngle: 12, method: self)
+          
         case .gulf:
-            return CalculationParameters(fajrAngle: 19.5, ishaInterval: 90, method: self)
-        case .moonsightingCommittee:
-            return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
-        case .northAmerica:
-            return CalculationParameters(fajrAngle: 15, ishaAngle: 15, method: self)
+          return CalculationParameters(fajrAngle: 19.5, ishaInterval: 90, method: self)
+          
+        case .JAKIM:
+          return CalculationParameters(fajrAngle: 20, ishaAngle: 18, method: self)
+          
+        case .jordan:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
+          
+        case .karachi:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
+          
+        case .kementerian:
+          return CalculationParameters(fajrAngle: 20, ishaAngle: 18, method: self)
+          
         case .kuwait:
-            return CalculationParameters(fajrAngle: 18, ishaAngle: 17.5, method: self)
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 17.5, method: self)
+          
+        case .moonsightingCommittee:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
+          
+        case .MUIS:
+          return CalculationParameters(fajrAngle: 20, ishaAngle: 18, method: self)
+          
+        case .muslimWorldLeague:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 17, method: self)
+          
+        case .northAmerica:
+          return CalculationParameters(fajrAngle: 15, ishaAngle: 15, method: self)
+          
+        case .oman:
+          return CalculationParameters(fajrAngle: 18, ishaInterval: 90, method: self)
+          
         case .qatar:
-            return CalculationParameters(fajrAngle: 18, ishaInterval: 90, method: self)
+          return CalculationParameters(fajrAngle: 18, ishaInterval: 90, method: self)
+          
+        case .russia:
+          return CalculationParameters(fajrAngle: 16, ishaAngle: 15, method: self)
+          
+        case .tunisian:
+          return CalculationParameters(fajrAngle: 18, ishaAngle: 18, method: self)
+          
+        case .UAE:
+          return CalculationParameters(fajrAngle: 18.5, ishaInterval: 90, method: self)
+          
+        case .ummAlQura:
+          return CalculationParameters(fajrAngle: 18.5, ishaInterval: 90, method: self)
+          
+        case .ummAlQuraRamadan:
+          return CalculationParameters(fajrAngle: 18.5, ishaInterval: 120, method: self)
+          
         case .other:
-            return CalculationParameters(fajrAngle: 0, ishaAngle: 0, method: self)
+          return CalculationParameters(fajrAngle: 0, ishaAngle: 0, method: self)
+          
         }
     }
 }
+
 
 /* Prayer times for a location and date using the given calculation parameters.
 All prayer times are in UTC and should be display using a DateFormatter that

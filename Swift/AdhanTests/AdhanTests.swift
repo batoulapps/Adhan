@@ -69,11 +69,11 @@ class AdhanTests: XCTestCase {
         XCTAssertEqual(p1.ishaInterval, 0)
         XCTAssertEqual(p1.method, CalculationMethod.muslimWorldLeague)
         
-        let p2 = CalculationMethod.egyptian.params
+        let p2 = CalculationMethod.egyptianGeneralAuthority.params
         XCTAssertEqual(p2.fajrAngle, 19.5)
         XCTAssertEqual(p2.ishaAngle, 17.5)
         XCTAssertEqual(p2.ishaInterval, 0)
-        XCTAssertEqual(p2.method, CalculationMethod.egyptian)
+        XCTAssertEqual(p2.method, CalculationMethod.egyptianGeneralAuthority)
         
         let p3 = CalculationMethod.karachi.params
         XCTAssertEqual(p3.fajrAngle, 18)
