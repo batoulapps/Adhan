@@ -222,6 +222,36 @@ class AdhanTests: XCTestCase {
         XCTAssertEqual(dateFormatter.string(from: p.isha), "7:05 PM")
     }
     
+    func testJafariMethod() {
+        // Values from http://praytimes.org/code/
+        var comps = DateComponents()
+        comps.year = 2017
+        comps.month = 6
+        comps.day = 16
+        let p = PrayerTimes(coordinates: Coordinates(latitude: 43, longitude: -80), date: comps, calculationParameters: CalculationMethod.shia.params)!
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(identifier: "America/New_York")!
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .short
+        
+        XCTAssertEqual(dateFormatter.string(from: p.fajr), "3:43 AM")
+        XCTAssertEqual(dateFormatter.string(from: p.sunrise), "5:40 AM")
+        XCTAssertEqual(dateFormatter.string(from: p.dhuhr), "1:22 PM")
+        XCTAssertEqual(dateFormatter.string(from: p.asr), "5:26 PM")
+        XCTAssertEqual(dateFormatter.string(from: p.maghrib), "9:23 PM")
+        XCTAssertEqual(dateFormatter.string(from: p.isha), "10:40 PM")
+        
+        let p2 = PrayerTimes(coordinates: Coordinates(latitude: 43, longitude: -80), date: comps, calculationParameters: CalculationMethod.tehran.params)!
+        
+        XCTAssertEqual(dateFormatter.string(from: p2.fajr), "3:25 AM")
+        XCTAssertEqual(dateFormatter.string(from: p2.sunrise), "5:40 AM")
+        XCTAssertEqual(dateFormatter.string(from: p2.dhuhr), "1:22 PM")
+        XCTAssertEqual(dateFormatter.string(from: p2.asr), "5:26 PM")
+        XCTAssertEqual(dateFormatter.string(from: p2.maghrib), "9:26 PM")
+        XCTAssertEqual(dateFormatter.string(from: p2.isha), "10:40 PM")
+    }
+    
     func testMoonsightingMethodHighLat() {
         // Values from http://www.moonsighting.com/pray.php
         var comps = DateComponents()

@@ -22,6 +22,7 @@ public enum Prayer {
 public enum Madhab {
     case shafi
     case hanafi
+    case jafari
     
     var shadowLength: ShadowLength {
         switch(self) {
@@ -29,6 +30,8 @@ public enum Madhab {
             return .single
         case .hanafi:
             return .double
+        case .jafari:
+            return Madhab.shafi.shadowLength
         }
     }
 }
@@ -74,6 +77,7 @@ public struct PrayerAdjustments {
 public struct CalculationParameters {
     public var method: CalculationMethod = .other
     public var fajrAngle: Double
+    public var maghribAngle: Double = 0
     public var ishaAngle: Double
     public var ishaInterval: Int = 0
     public var madhab: Madhab = .shafi
@@ -100,14 +104,19 @@ public struct CalculationParameters {
         self.method = method
     }
     
-    func nightPortions() -> (fajr: Double, isha: Double) {
+    init(fajrAngle: Double, maghribAngle: Double, ishaAngle: Double, method: CalculationMethod) {
+        self.init(fajrAngle: fajrAngle, ishaAngle: ishaAngle, method: method)
+        self.maghribAngle = maghribAngle
+    }
+    
+    func nightPortions() -> (fajr: Double, maghrib: Double, isha: Double) {
         switch self.highLatitudeRule {
         case .middleOfTheNight:
-            return (1/2, 1/2)
+            return (1/2, 1/2, 1/2)
         case .seventhOfTheNight:
-            return (1/7, 1/7)
+            return (1/7, 1/7, 1/7)
         case .twilightAngle:
-            return (self.fajrAngle / 60, self.ishaAngle / 60)
+            return (self.fajrAngle / 60, self.maghribAngle / 60, self.ishaAngle / 60)
         }
     }
 }
@@ -142,6 +151,12 @@ public enum CalculationMethod {
     // Qatar
     case qatar
     
+    // Institute of Geophysics, University of Tehran
+    case tehran
+    
+    // Shia Ithna-Ashari, Leva Institute, Qum
+    case shia
+    
     // Other
     case other
     
@@ -165,6 +180,10 @@ public enum CalculationMethod {
             return CalculationParameters(fajrAngle: 18, ishaAngle: 17.5, method: self)
         case .qatar:
             return CalculationParameters(fajrAngle: 18, ishaInterval: 90, method: self)
+        case .tehran:
+            return CalculationParameters(fajrAngle: 17.7, maghribAngle: 4.5, ishaAngle: 14.0, method: self)
+        case .shia:
+            return CalculationParameters(fajrAngle: 16.0, maghribAngle: 4.0, ishaAngle: 14.0, method: self)
         case .other:
             return CalculationParameters(fajrAngle: 0, ishaAngle: 0, method: self)
         }
@@ -192,6 +211,7 @@ public struct PrayerTimes {
         var tempSunrise: Date? = nil
         var tempDhuhr: Date? = nil
         var tempAsr: Date? = nil
+        var tempSunset: Date? = nil
         var tempMaghrib: Date? = nil
         var tempIsha: Date? = nil
         let cal: Calendar = .gregorianUTC
@@ -222,7 +242,7 @@ public struct PrayerTimes {
         
         tempDhuhr = cal.date(from: transit)
         tempSunrise = cal.date(from: sunriseComponents)
-        tempMaghrib = cal.date(from: sunsetComponents)
+        tempSunset = cal.date(from: sunsetComponents)
         
         if let asrComponents = solarTime.afternoon(shadowLength: calculationParameters.madhab.shadowLength).timeComponents()?.dateComponents(date) {
             tempAsr = cal.date(from: asrComponents)
@@ -257,9 +277,29 @@ public struct PrayerTimes {
             tempFajr = safeFajr
         }
         
+        // Maghrib calculation with check against safe value
+        if calculationParameters.maghribAngle > 0 {
+            if let maghribComponents = solarTime.hourAngle(angle: -calculationParameters.maghribAngle, afterTransit: true).timeComponents()?.dateComponents(date) {
+                tempMaghrib = cal.date(from: maghribComponents)
+            }
+            
+            let safeMaghrib: Date = {
+                let portion = calculationParameters.nightPortions().maghrib
+                let nightFraction = portion * night
+                
+                return sunsetDate.addingTimeInterval(nightFraction)
+            }()
+            
+            if tempMaghrib == nil || tempMaghrib?.compare(safeMaghrib) == .orderedDescending {
+                tempMaghrib = safeMaghrib
+            }
+        } else {
+            tempMaghrib = tempSunset
+        }
+        
         // Isha calculation with check against safe value
         if calculationParameters.ishaInterval > 0 {
-            tempIsha = tempMaghrib?.addingTimeInterval(calculationParameters.ishaInterval.timeInterval())
+            tempIsha = tempSunset?.addingTimeInterval(calculationParameters.ishaInterval.timeInterval())
         } else {
             if let ishaComponents = solarTime.hourAngle(angle: -calculationParameters.ishaAngle, afterTransit: true).timeComponents()?.dateComponents(date) {
                 tempIsha = cal.date(from: ishaComponents)
