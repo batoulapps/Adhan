@@ -31,7 +31,7 @@ public enum Madhab {
         case .hanafi:
             return .double
         case .jafari:
-            return Madhab.shafi.shadowLength
+            return .single
         }
     }
 }
