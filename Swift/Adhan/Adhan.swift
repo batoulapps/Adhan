@@ -109,14 +109,14 @@ public struct CalculationParameters {
         self.maghribAngle = maghribAngle
     }
     
-    func nightPortions() -> (fajr: Double, maghrib: Double, isha: Double) {
+    func nightPortions() -> (fajr: Double, isha: Double) {
         switch self.highLatitudeRule {
         case .middleOfTheNight:
-            return (1/2, 1/2, 1/2)
+            return (1/2, 1/2)
         case .seventhOfTheNight:
-            return (1/7, 1/7, 1/7)
+            return (1/7, 1/7)
         case .twilightAngle:
-            return (self.fajrAngle / 60, self.maghribAngle / 60, self.ishaAngle / 60)
+            return (self.fajrAngle / 60, self.ishaAngle / 60)
         }
     }
 }
@@ -277,26 +277,6 @@ public struct PrayerTimes {
             tempFajr = safeFajr
         }
         
-        // Maghrib calculation with check against safe value
-        if calculationParameters.maghribAngle > 0 {
-            if let maghribComponents = solarTime.hourAngle(angle: -calculationParameters.maghribAngle, afterTransit: true).timeComponents()?.dateComponents(date) {
-                tempMaghrib = cal.date(from: maghribComponents)
-            }
-            
-            let safeMaghrib: Date = {
-                let portion = calculationParameters.nightPortions().maghrib
-                let nightFraction = portion * night
-                
-                return sunsetDate.addingTimeInterval(nightFraction)
-            }()
-            
-            if tempMaghrib == nil || tempMaghrib?.compare(safeMaghrib) == .orderedDescending {
-                tempMaghrib = safeMaghrib
-            }
-        } else {
-            tempMaghrib = tempSunset
-        }
-        
         // Isha calculation with check against safe value
         if calculationParameters.ishaInterval > 0 {
             tempIsha = tempSunset?.addingTimeInterval(calculationParameters.ishaInterval.timeInterval())
@@ -326,6 +306,25 @@ public struct PrayerTimes {
             if tempIsha == nil || tempIsha?.compare(safeIsha) == .orderedDescending {
                 tempIsha = safeIsha
             }
+        }
+        
+        // Maghrib calculation with check against safe value
+        if calculationParameters.maghribAngle > 0 {
+            if let maghribComponents = solarTime.hourAngle(angle: -calculationParameters.maghribAngle, afterTransit: true).timeComponents()?.dateComponents(date) {
+                tempMaghrib = cal.date(from: maghribComponents)
+            }
+            
+            if let tempAsr = tempAsr, let tempIsha = tempIsha {
+                // maghrib safe if falls between asr and maghrib
+                if tempMaghrib == nil || tempMaghrib?.compare(tempAsr) == .orderedAscending || tempMaghrib?.compare(tempIsha) == .orderedDescending {
+                    tempMaghrib = tempSunset
+                }
+            } else {
+                // fallback to regular sunset
+                tempMaghrib = tempSunset
+            }
+        } else {
+            tempMaghrib = tempSunset
         }
         
         
