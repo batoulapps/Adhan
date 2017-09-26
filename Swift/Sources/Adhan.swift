@@ -151,6 +151,9 @@ public enum CalculationMethod {
     // Qatar
     case qatar
     
+    // Singapore
+    case singapore
+    
     // Institute of Geophysics, University of Tehran
     case tehran
     
@@ -180,6 +183,8 @@ public enum CalculationMethod {
             return CalculationParameters(fajrAngle: 18, ishaAngle: 17.5, method: self)
         case .qatar:
             return CalculationParameters(fajrAngle: 18, ishaInterval: 90, method: self)
+        case .singapore:
+            return CalculationParameters(fajrAngle: 20, ishaAngle: 18, method: self)
         case .tehran:
             return CalculationParameters(fajrAngle: 17.7, maghribAngle: 4.5, ishaAngle: 14.0, method: self)
         case .shia:
