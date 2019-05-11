@@ -20,6 +20,14 @@ of the National Oceanic and Atmospheric Administration.
  - ### [adhan-testdata](https://github.com/batoulapps/adhan-testdata)
    - Shared compilation of prayer times for all implementations to test against
 
+## Additional Implementations
+
+- ### [Adhan-csharp](https://github.com/davidpet86/Adhan-csharp) 
+   - C# implementation developed by [davidpet86](https://github.com/davidpet86)
+- ### [adhan-c](https://github.com/radcheb/Adhan/tree/master/C/adhan) 
+   - C implementation developed by [radcheb](https://github.com/radcheb)
+- ### [salah](https://github.com/insha/salah) 
+   - Rust implementation developed by [insha](https://github.com/insha)
 
 ## Discussion & Issues
 
