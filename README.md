@@ -28,6 +28,8 @@ of the National Oceanic and Atmospheric Administration.
    - C implementation developed by [radcheb](https://github.com/radcheb)
 - ### [salah](https://github.com/insha/salah) 
    - Rust implementation developed by [insha](https://github.com/insha)
+- ### [adhan-dart](https://github.com/iamriajul/adhan-dart)
+   - Dart implementation developed by [iamriajul](https://github.com/iamriajul)
 
 ## Discussion & Issues
 
