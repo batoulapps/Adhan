@@ -30,6 +30,8 @@ of the National Oceanic and Atmospheric Administration.
    - Rust implementation developed by [insha](https://github.com/insha)
 - ### [adhan-dart](https://github.com/iamriajul/adhan-dart)
    - Dart implementation developed by [iamriajul](https://github.com/iamriajul)
+- ### [adhanpy](https://github.com/alphahm/adhanpy)
+   - Python implementation developed by [alphahm](https://github.com/alphahm)
 
 ## Discussion & Issues
 
