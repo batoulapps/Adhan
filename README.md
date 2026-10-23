@@ -15,7 +15,7 @@ of the National Oceanic and Atmospheric Administration.
    - Swift & Objective-C (iOS) implementation
 - ### [adhan-js](https://github.com/batoulapps/adhan-js)
    - JavaScript (Node & Web browser) implementation
-- ### [adhan-java](https://github.com/batoulapps/adhan-java)
+- ### [adhan-kotlin](https://github.com/batoulapps/adhan-kotlin)
    - Java (Android) implementation
  - ### [adhan-testdata](https://github.com/batoulapps/adhan-testdata)
    - Shared compilation of prayer times for all implementations to test against
