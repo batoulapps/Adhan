@@ -12,11 +12,11 @@ of the National Oceanic and Atmospheric Administration.
 ## Repositories
 
 - ### [adhan-swift](https://github.com/batoulapps/adhan-swift) 
-   - Swift & Objective-C (iOS) implementation
+   - Swift implementation
 - ### [adhan-js](https://github.com/batoulapps/adhan-js)
-   - JavaScript (Node & Web browser) implementation
+   - JavaScript implementation
 - ### [adhan-kotlin](https://github.com/batoulapps/adhan-kotlin)
-   - Kotlin (Android) implementation
+   - Kotlin implementation
  - ### [adhan-testdata](https://github.com/batoulapps/adhan-testdata)
    - Shared compilation of prayer times for all implementations to test against
 
